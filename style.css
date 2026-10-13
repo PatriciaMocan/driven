@@ -1,0 +1,454 @@
+/* =========================================================
+   Elen Sunglasses — styles
+   Mobile-first: base styles are for phones, and the
+   @media (min-width: ...) blocks add changes for bigger screens.
+   ========================================================= */
+
+/* ---------- 1. Colours, fonts and spacing ----------
+   Change the brand look here. Everything else uses these variables. */
+:root {
+  --color-bg: #F7F4EE;        /* off-white page background */
+  --color-beige: #E9DFD0;     /* warm beige for panels */
+  --color-text: #1D1B19;      /* near-black text */
+  --color-muted: #6F675E;     /* softer text for descriptions */
+  --color-line: #DDD3C5;      /* thin borders */
+  --color-accent: #B5532E;    /* terracotta accent (buttons, links) */
+  --color-accent-dark: #93401F;
+  --color-error: #A3271B;
+
+  --font-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --space-section: 5rem;      /* vertical space between sections */
+  --container: 1200px;        /* max content width */
+  --radius: 2px;
+}
+
+/* ---------- 2. Basic reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+
+p { margin: 0 0 1rem; }
+
+a { color: inherit; }
+
+ul { list-style: none; margin: 0; padding: 0; }
+
+figure { margin: 0; }
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ---------- 3. Layout helpers ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.section { padding: var(--space-section) 0; }
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: clamp(2.1rem, 6vw, 3.2rem);
+  margin-bottom: 1.25rem;
+}
+
+.section-intro {
+  color: var(--color-muted);
+  max-width: 34rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 0.5rem 1rem;
+  z-index: 100;
+}
+.skip-link:focus { left: 1rem; top: 1rem; }
+
+/* ---------- 4. Buttons ---------- */
+.btn {
+  display: inline-block;
+  font: 500 0.95rem/1 var(--font-sans);
+  letter-spacing: 0.02em;
+  padding: 1rem 1.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+.btn-primary:hover { background: var(--color-accent); }
+
+/* ---------- 5. Header ---------- */
+.site-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.logo {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  margin: 0;
+}
+
+.header-link {
+  font-size: 0.875rem;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+.header-link:hover { color: var(--color-accent); }
+
+/* ---------- 6. Hero ---------- */
+.hero {
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+
+.hero-inner {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.hero-title {
+  font-size: clamp(4.5rem, 20vw, 9.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.hero-lead {
+  font-size: 1.125rem;
+  max-width: 26rem;
+  margin-bottom: 2rem;
+}
+
+.hero-media img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+/* ---------- 7. About ---------- */
+.about { background: var(--color-beige); }
+
+.about-inner {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.about-media img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.about-text p:not(.eyebrow) { max-width: 32rem; }
+
+/* ---------- 8. Gallery ---------- */
+.section-head { margin-bottom: 3rem; }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem 1.5rem;
+}
+
+/* The image sits inside a <button> so it works with the keyboard too. */
+.gallery-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--color-beige);
+  cursor: zoom-in;
+  overflow: hidden;           /* keeps the zoomed image inside its box */
+  margin-bottom: 1rem;
+}
+
+.gallery-button img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+/* Slight zoom on hover / keyboard focus */
+.gallery-button:hover img,
+.gallery-button:focus-visible img {
+  transform: scale(1.04);
+}
+
+.model-name {
+  font-size: 1.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.model-desc {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ---------- 9. Lightbox ---------- */
+.lightbox {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 1.5rem;
+  border: 0;
+  background: rgba(247, 244, 238, 0.97);
+  color: var(--color-text);
+}
+.lightbox[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lightbox-in 0.25s ease;
+}
+.lightbox::backdrop { background: rgba(29, 27, 25, 0.4); }
+
+.lightbox figure { max-width: min(90vw, 640px); text-align: center; }
+
+.lightbox img {
+  max-height: 78vh;
+  width: auto;
+  margin: 0 auto 1rem;
+}
+
+.lightbox figcaption {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+}
+
+.lightbox-close,
+.lightbox-nav {
+  position: absolute;
+  background: none;
+  border: 0;
+  color: var(--color-text);
+  font-size: 2.5rem;
+  line-height: 1;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+.lightbox-close { top: 0.75rem; right: 0.75rem; }
+.lightbox-prev { left: 0.25rem; top: 50%; transform: translateY(-50%); }
+.lightbox-next { right: 0.25rem; top: 50%; transform: translateY(-50%); }
+.lightbox-close:hover,
+.lightbox-nav:hover { color: var(--color-accent); }
+
+@keyframes lightbox-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- 10. Notify form ---------- */
+.notify-inner { max-width: 40rem; }
+
+.notify-form { margin-top: 2rem; }
+
+.field { margin-bottom: 1.5rem; }
+
+.field label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.optional { color: var(--color-muted); font-weight: 400; }
+
+.field input[type="text"],
+.field input[type="email"] {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;          /* 16px stops iPhones zooming in on focus */
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  color: var(--color-text);
+}
+.field input:focus { border-color: var(--color-text); outline: none; }
+.field input[aria-invalid="true"] { border-color: var(--color-error); }
+
+.field-checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+.field-checkbox input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0.2rem 0 0;
+  accent-color: var(--color-accent);
+}
+.field-checkbox label {
+  font-weight: 400;
+  color: var(--color-muted);
+  margin: 0;
+}
+.field-checkbox .field-error { grid-column: 1 / -1; }
+
+.field-error {
+  color: var(--color-error);
+  font-size: 0.85rem;
+  margin: 0.4rem 0 0;
+  min-height: 0;
+}
+.field-error:empty { display: none; }
+
+.form-success {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: var(--color-beige);
+  border-left: 3px solid var(--color-accent);
+}
+.form-success:focus { outline: none; }
+.form-success h3 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.form-success p { margin: 0; }
+
+/* ---------- 11. Footer ---------- */
+.site-footer {
+  background: var(--color-text);
+  color: #CFC6BA;
+  padding: 3.5rem 0 2.5rem;
+  font-size: 0.9rem;
+}
+.site-footer .logo { color: var(--color-bg); }
+
+.footer-inner { display: grid; gap: 2rem; }
+
+.footer-links { display: grid; gap: 0.5rem; }
+.footer-links a { text-decoration: none; border-bottom: 1px solid rgba(207, 198, 186, 0.4); }
+.footer-links a:hover { color: #fff; border-color: #fff; }
+
+.footer-gdpr { max-width: 36rem; margin: 0; }
+.footer-small { font-size: 0.8rem; color: #8F867B; margin: 0; }
+
+/* ---------- 12. Fade-in on scroll ----------
+   Only active when JavaScript runs (the "js" class on <html>).
+   script.js adds "is-visible" when an element scrolls into view. */
+.js .fade-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.js .fade-in.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Respect people who turn off animations in their system settings */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .fade-in { opacity: 1; transform: none; transition: none; }
+  .gallery-button img { transition: none; }
+  .lightbox[open] { animation: none; }
+}
+
+/* =========================================================
+   Bigger screens
+   ========================================================= */
+
+/* Tablets (600px and up) */
+@media (min-width: 600px) {
+  .container { padding: 0 2rem; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer-gdpr { grid-column: 1 / -1; }
+}
+
+/* Laptops and desktops (900px and up) */
+@media (min-width: 900px) {
+  :root { --space-section: 8rem; }
+
+  .hero {
+    min-height: min(100vh, 900px);
+    display: flex;
+    align-items: center;
+    padding-top: 7rem;
+  }
+  .hero-inner {
+    grid-template-columns: 5fr 7fr;
+    align-items: center;
+    gap: 4rem;
+  }
+  .hero-media img { aspect-ratio: 4 / 3.4; }
+
+  .about-inner {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 6rem;
+  }
+
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 4rem 2rem; }
+
+  .lightbox-prev { left: 2rem; }
+  .lightbox-next { right: 2rem; }
+  .lightbox-close { top: 1.5rem; right: 2rem; }
+
+  .footer-inner {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+}
