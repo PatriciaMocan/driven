@@ -1,70 +1,77 @@
-# Elen Sunglasses — landing page
+# Elen Sunglasses — shop
 
-A one-page "coming soon" site. Plain HTML, CSS and JavaScript: no frameworks, no build step.
+A one-page shop for Elen's luxury sunglasses. Plain HTML, CSS and JavaScript, no build step, ready for Vercel.
 
 ```
-index.html   page content (all the text lives here)
-style.css    colours, fonts, layout
-script.js    scroll fade-ins, gallery lightbox, signup form
-images/      all pictures, the favicon and the social share image
+index.html        page layout and text
+products.js       THE PRODUCT LIST: names, prices, photos, descriptions
+style.css         colours, fonts, layout
+script.js         shop grid, filters, quick view, bag, checkout, newsletter form
+api/checkout.js   Stripe checkout (only used if you switch checkout to Stripe)
+images/           favicon, share image, and fallback placeholders
 ```
+
+## Before you take real orders
+
+- **The photos are stand-ins.** They are free stock photos from [Unsplash](https://unsplash.com) (free for commercial use), but they show other people's sunglasses, not Elen frames. Selling a product with a photo of a different product misleads customers, so replace every photo with your own before switching checkout on.
+- **Check every claim against your real products and policies:** prices, materials ("Italian acetate", "titanium"), lens specs, "free EU shipping", "30-day returns" and "2-year warranty".
+- **Add the legal pages** linked in the footer (shipping & returns, terms of sale, privacy policy, legal notice). EU online shops are required to have them, including information about the 14-day right of withdrawal.
 
 ## Preview it
 
-Double-click `index.html` to open it in your browser. That's all you need.
+Double-click `index.html`. Everything works locally except Stripe checkout, which only runs once the site is on Vercel.
 
 ## Deploy to Vercel
 
-1. Push this folder to a GitHub repository.
-2. On [vercel.com](https://vercel.com), click **Add New → Project** and import the repo.
-3. Leave every setting as it is (Framework preset: **Other**, no build command) and click **Deploy**.
+1. On [vercel.com/new](https://vercel.com/new), import this GitHub repository.
+2. Framework preset: **Other**. Leave the build command empty. Click **Deploy**.
 
-Every new push to GitHub redeploys the site automatically.
+Every push to GitHub redeploys automatically.
 
-## Replace the images
+## Add, remove or edit products
 
-The images in `images/` are drawn placeholders. To use real photos:
+Open `products.js`. Each product is one `{ ... }` block. Copy a block to add a product, delete one to remove it. Prices are in euros including VAT, as whole numbers (`price: 340`).
 
-1. Put your photo in the `images/` folder. JPG or WebP, about **1600px wide** and under **300 KB** is a good target (use [squoosh.app](https://squoosh.app) to shrink them).
-2. In `index.html`, find the `<img>` tag and change `src`. Also update `alt` so it describes the photo (screen readers and Google use it).
+The filter buttons use the `material` field: `"acetate"`, `"metal"` or `"mixed"` (shown as "Browline").
 
-| Image | Where it's used | Shape |
-|---|---|---|
-| `hero.svg` | Top of the page | Landscape, roughly 4:3 or 16:10 |
-| `about.svg` | Next to the brand story | Portrait, 4:5 |
-| `model-*.svg` | The six gallery cards | Portrait, 4:5 |
-| `og-image.png` | Preview card when the link is shared | Exactly 1200 × 630 |
-| `favicon.svg` | Browser tab icon | Square |
+## Replace the photos
 
-Photos are cropped automatically to fill their box, so they don't need the exact shape. Just keep the sunglasses near the centre.
+1. Put your photos in `images/`. JPG or WebP, about 1200px wide, portrait (4:5) works best, under 300 KB each ([squoosh.app](https://squoosh.app) shrinks them).
+2. In `products.js`, change `image` to the file, e.g. `image: 'images/sola.jpg'`, and update `imageAlt` to describe the photo. Delete the `credit` line.
+3. The hero and About photos are in `index.html`: search for `unsplash.com` and replace those links the same way.
+4. When no Unsplash photos are left, remove the "Placeholder photos from Unsplash" line in the footer.
 
-Example: to swap the first gallery model for `marea.jpg`:
+If a photo ever fails to load, the site automatically shows the matching drawing from `images/` (`model-sola.svg` and so on) instead of a broken image.
 
-```html
-<img src="images/marea.jpg" alt="Marea, round black sunglasses on a stone wall"
-     width="800" height="1000" loading="lazy" decoding="async">
-```
+## Turn on checkout
 
-`width` and `height` only tell the browser the shape so the page doesn't jump while loading. Set them to your photo's real size if you like.
+Open `script.js`. At the top, `CHECKOUT.mode` is `'demo'`, which means nobody can pay yet. Pick one:
 
-## Replace the text
+### Stripe (recommended if you don't have a shop platform)
 
-All text is in `index.html`. Each section starts with a comment like `<!-- ===== 2. ABOUT ===== -->` so you can find it.
+1. Create a [Stripe](https://stripe.com) account and copy your **secret key** from Developers → API keys. Start with the test key (`sk_test_...`).
+2. In Vercel: your project → Settings → Environment Variables → add `STRIPE_SECRET_KEY` with that key. Redeploy.
+3. In `script.js`, set `mode: 'stripe'`, commit and push.
+4. Test with card number `4242 4242 4242 4242`, any future date, any CVC. When it works, swap in your live key (`sk_live_...`).
 
-- **Brand story:** the two paragraphs marked `[EDIT ME]`. Remove the `[EDIT ME]` tag when you're done.
-- **Gallery:** each model is one `<li class="gallery-item">` block. Change the name (`<h3>`) and description (`<p>`). To add or remove a model, copy or delete a whole `<li>...</li>` block; the lightbox picks it up automatically.
-- **Footer:** replace the Instagram link and `hello@example.com`.
-- **Launch date:** search for "spring 2027".
-- **Search & sharing text:** the `<title>`, `description` and `og:` tags at the top of `index.html`. Replace `https://elensunglasses.com` with your real domain, or the share preview image won't load.
+Prices are read from `products.js` on the server, so nobody can change them in their browser. To change which countries you ship to, edit `SHIP_TO` in `api/checkout.js`. For VAT and tax settings, see Stripe Tax in your Stripe dashboard.
 
-## Change colours and fonts
+### Shopify
 
-Open `style.css`. The first block (`:root`) holds every colour and both font names. Change a value there and it updates everywhere. The accent colour is `--color-accent`.
+Use this if your products, stock and payments live in Shopify.
 
-To use different fonts, pick them on [Google Fonts](https://fonts.google.com), replace the `<link href="https://fonts.googleapis.com/...">` line in `index.html`, then update `--font-serif` and `--font-sans`.
+1. Find each product's **variant ID** in Shopify admin (open the product, click the variant; the number at the end of the URL).
+2. Put it in `products.js` as `shopifyVariantId: '1234567890'`.
+3. In `script.js`, set `mode: 'shopify'` and `shopifyDomain: 'your-store.myshopify.com'`.
 
-## Connect the signup form
+Checkout then opens Shopify's own checkout with the bag already filled in.
 
-Right now the form only shows a thank-you message and doesn't save anything. Open `script.js` and look for **CONNECT YOUR EMAIL SERVICE HERE**. There are step-by-step notes for Formspree (easiest, free tier available) and Mailchimp.
+## Connect the newsletter form
 
-GDPR reminder: whichever service you use, keep the consent checkbox, and make sure the unsubscribe and deletion promise in the footer is true for that service.
+The form shows a thank-you message but doesn't save anything yet. In `script.js`, look for **CONNECT YOUR EMAIL SERVICE HERE** for Formspree and Mailchimp steps.
+
+## Change text, colours and fonts
+
+- **Text:** all in `index.html`; each section starts with a comment like `<!-- ===== 4. ABOUT ===== -->`. The brand story is marked `[EDIT ME]`.
+- **Colours and fonts:** the `:root` block at the top of `style.css`. The accent colour is `--color-accent`.
+- **Share preview:** the `og:` tags at the top of `index.html`. Replace `https://elensunglasses.com` with your real domain.

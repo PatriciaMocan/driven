@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- ===== Page title and description (shown in Google results) ===== -->
-  <title>Elen Sunglasses — Launching soon</title>
-  <meta name="description" content="Elen is a small European sunglasses brand. Six frames, polarised lenses, fair prices. Leave your email and we'll tell you when the first collection goes live.">
+  <title>Elen Sunglasses — Handmade luxury sunglasses</title>
+  <meta name="description" content="Elen makes luxury sunglasses in small runs: Italian acetate, titanium and polarised lenses. Free EU shipping, 30-day returns.">
   <meta name="theme-color" content="#F7F4EE">
 
   <!-- ===== Open Graph tags (the preview card when the link is shared) =====
-       Replace https://elensunglasses.com with your real domain once you have it. -->
+       Replace https://elensunglasses.com with your real domain. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Elen Sunglasses">
-  <meta property="og:title" content="Elen Sunglasses — Launching soon">
-  <meta property="og:description" content="Six frames, polarised lenses, fair prices. Get a note from us on launch day.">
+  <meta property="og:title" content="Elen Sunglasses — Handmade luxury sunglasses">
+  <meta property="og:description" content="Italian acetate, titanium, polarised lenses. Made in small runs, shipped across Europe.">
   <meta property="og:url" content="https://elensunglasses.com/">
   <meta property="og:image" content="https://elensunglasses.com/images/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -31,8 +31,7 @@
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Tells the CSS that JavaScript is running, so scroll animations can be enabled.
-       Without JS, everything is simply visible. -->
+  <!-- Tells the CSS that JavaScript is running, so scroll animations can be enabled. -->
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -43,38 +42,97 @@
   <header class="site-header">
     <div class="container header-inner">
       <a href="#top" class="logo" aria-label="Elen Sunglasses, back to top">Elen</a>
-      <a href="#notify" class="header-link">Get launch news</a>
+      <nav class="main-nav" aria-label="Main">
+        <a href="#shop">Shop</a>
+        <a href="#about">About</a>
+        <button class="bag-button" type="button" id="bag-open" aria-label="Open shopping bag">
+          Bag <span class="bag-count" id="bag-count">0</span>
+        </button>
+      </nav>
     </div>
   </header>
 
   <main id="main">
 
-    <!-- ================= 1. HERO ================= -->
+    <!-- ================= 1. HERO =================
+         The picture behind the text. If the photo can't load, onerror swaps
+         in a local placeholder so the page never shows a broken image. -->
     <section class="hero" id="top">
+      <img class="hero-bg"
+           src="https://unsplash.com/photos/zy0P4vq4xw0/download?w=2000"
+           alt="" width="2000" height="1333" fetchpriority="high"
+           onerror="this.onerror=null;this.src='images/hero.svg'">
       <div class="container hero-inner">
-        <div class="hero-text">
-          <p class="eyebrow">Sunglasses · Launching spring 2027</p>
-          <h1 class="hero-title">Elen</h1>
-          <p class="hero-lead">
-            Well-made sunglasses at a price that doesn't make you nervous about leaving them on a café table.
-          </p>
-          <a href="#notify" class="btn btn-primary">Tell me when you launch</a>
-        </div>
-
-        <figure class="hero-media">
-          <!-- Hero image loads straight away (no lazy-loading) because it's visible first. -->
-          <img src="images/hero.svg" alt="Tortoiseshell cat-eye sunglasses on a warm beige background"
-               width="1600" height="1000" fetchpriority="high">
-        </figure>
+        <p class="eyebrow">Summer collection · Eight frames</p>
+        <h1 class="hero-title">Elen</h1>
+        <p class="hero-lead">
+          Sunglasses made the slow way, in Italian acetate and titanium. Small runs, no logos on the arms.
+        </p>
+        <a href="#shop" class="btn btn-light">Shop the collection</a>
       </div>
     </section>
 
-    <!-- ================= 2. ABOUT / BRAND STORY ================= -->
+    <!-- ================= 2. PROMISES STRIP =================
+         [EDIT ME] Make sure these match your real shipping and returns policy. -->
+    <section class="promises" aria-label="Shipping and returns">
+      <ul class="container promises-list">
+        <li>Free shipping across the EU</li>
+        <li>30-day returns</li>
+        <li>2-year warranty</li>
+      </ul>
+    </section>
+
+    <!-- ================= 3. SHOP =================
+         The product cards are created by script.js from products.js.
+         To add or change a product, edit products.js — not this file. -->
+    <section class="shop section" id="shop">
+      <div class="container">
+        <div class="shop-head fade-in">
+          <div>
+            <p class="eyebrow">The collection</p>
+            <h2 class="section-title">Shop sunglasses</h2>
+          </div>
+
+          <div class="shop-controls">
+            <!-- Filter buttons (by frame material) -->
+            <div class="filters" role="group" aria-label="Filter by material">
+              <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">All</button>
+              <button type="button" class="filter" data-filter="acetate" aria-pressed="false">Acetate</button>
+              <button type="button" class="filter" data-filter="metal" aria-pressed="false">Metal</button>
+              <button type="button" class="filter" data-filter="mixed" aria-pressed="false">Browline</button>
+            </div>
+
+            <label class="sort">
+              <span class="visually-hidden">Sort by</span>
+              <select id="sort">
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <ul class="product-grid" id="product-grid">
+          <!-- Filled in by script.js -->
+        </ul>
+
+        <noscript>
+          <p>Please turn on JavaScript to browse the collection.</p>
+        </noscript>
+
+        <p class="vat-note">All prices in euros, including VAT.</p>
+      </div>
+    </section>
+
+    <!-- ================= 4. ABOUT / BRAND STORY ================= -->
     <section class="about section" id="about">
       <div class="container about-inner">
         <figure class="about-media fade-in">
-          <img src="images/about.svg" alt="Round sunglasses with a terracotta frame"
-               width="800" height="1000" loading="lazy" decoding="async">
+          <img src="https://unsplash.com/photos/aI36oYho6Mg/download?w=1200"
+               alt="Woman in a black top wearing sunglasses"
+               width="800" height="1000" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='images/about.svg'">
         </figure>
 
         <div class="about-text fade-in">
@@ -82,100 +140,28 @@
           <h2 class="section-title">Why we started Elen</h2>
           <!-- [EDIT ME] Replace both paragraphs below with your own story. -->
           <p>
-            [EDIT ME] I spent years buying sunglasses that were either cheap and fell apart by August,
-            or expensive mostly because of the name printed on the arm. Elen is my attempt at the
-            pair in between. Acetate frames, polarised lenses, proper hinges. Nothing else on them.
+            [EDIT ME] Most luxury sunglasses are made in the same few factories as everyone else's,
+            then sold on the strength of a logo. We wanted to pay for the frame instead. Elen pairs
+            are cut from Italian acetate, polished by hand and fitted with polarised lenses.
           </p>
           <p>
-            [EDIT ME] We work with one small workshop and order in short runs, so we don't end up
-            with warehouses of stock nobody wanted. The first collection is six frames. We'd rather
-            get six right than rush out thirty.
+            [EDIT ME] We make each frame in runs of a few hundred. When a colour sells out, it may
+            come back next season, or it may not. That's the deal with doing it this way.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- ================= 3. GALLERY =================
-         Each model is one <li>. To change a model, edit the image src, the alt text,
-         the name (h3) and the description (p). Clicking an image opens the lightbox. -->
-    <section class="gallery section" id="collection">
-      <div class="container">
-        <div class="section-head fade-in">
-          <p class="eyebrow">The first collection</p>
-          <h2 class="section-title">Six frames</h2>
-          <p class="section-intro">Every pair comes with a cotton pouch and a two-year guarantee on the hinges.</p>
-        </div>
-
-        <ul class="gallery-grid">
-          <li class="gallery-item fade-in">
-            <button class="gallery-button" type="button" aria-label="View larger: Marea">
-              <img src="images/model-marea.svg" alt="Marea, round black sunglasses"
-                   width="800" height="1000" loading="lazy" decoding="async">
-            </button>
-            <h3 class="model-name">Marea</h3>
-            <p class="model-desc">A small round frame in black acetate. Suits narrower faces.</p>
-          </li>
-
-          <li class="gallery-item fade-in">
-            <button class="gallery-button" type="button" aria-label="View larger: Sola">
-              <img src="images/model-sola.svg" alt="Sola, brown cat-eye sunglasses"
-                   width="800" height="1000" loading="lazy" decoding="async">
-            </button>
-            <h3 class="model-name">Sola</h3>
-            <p class="model-desc">Soft cat-eye in dark tortoise. Our favourite so far, honestly.</p>
-          </li>
-
-          <li class="gallery-item fade-in">
-            <button class="gallery-button" type="button" aria-label="View larger: Corso">
-              <img src="images/model-corso.svg" alt="Corso, square black sunglasses with green lenses"
-                   width="800" height="1000" loading="lazy" decoding="async">
-            </button>
-            <h3 class="model-name">Corso</h3>
-            <p class="model-desc">Chunky square shape with bottle-green lenses.</p>
-          </li>
-
-          <li class="gallery-item fade-in">
-            <button class="gallery-button" type="button" aria-label="View larger: Lido">
-              <img src="images/model-lido.svg" alt="Lido, gold aviator sunglasses"
-                   width="800" height="1000" loading="lazy" decoding="async">
-            </button>
-            <h3 class="model-name">Lido</h3>
-            <p class="model-desc">A thin gold aviator. Light enough to forget you're wearing it.</p>
-          </li>
-
-          <li class="gallery-item fade-in">
-            <button class="gallery-button" type="button" aria-label="View larger: Vela">
-              <img src="images/model-vela.svg" alt="Vela, oval sunglasses with a terracotta frame"
-                   width="800" height="1000" loading="lazy" decoding="async">
-            </button>
-            <h3 class="model-name">Vela</h3>
-            <p class="model-desc">Oval, in a terracotta colour we went back and forth on for weeks.</p>
-          </li>
-
-          <li class="gallery-item fade-in">
-            <button class="gallery-button" type="button" aria-label="View larger: Ines">
-              <img src="images/model-ines.svg" alt="Ines, wide dark sunglasses"
-                   width="800" height="1000" loading="lazy" decoding="async">
-            </button>
-            <h3 class="model-name">Ines</h3>
-            <p class="model-desc">Wide and a bit dramatic. Good for actual beach days.</p>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ================= 4. NOTIFY ME FORM ================= -->
+    <!-- ================= 5. NEWSLETTER FORM ================= -->
     <section class="notify section" id="notify">
       <div class="container notify-inner fade-in">
-        <p class="eyebrow">Launch list</p>
-        <h2 class="section-title">Want to know when we launch?</h2>
+        <p class="eyebrow">The list</p>
+        <h2 class="section-title">Hear about new frames first</h2>
         <p class="section-intro">
-          Leave your email and we'll write once, on launch day. Early sign-ups get first pick
-          before anything sells out.
+          We email when a new frame or colour comes out, a few times a year. Subscribers get first access
+          before small runs sell out.
         </p>
 
-        <!-- novalidate turns off the browser's default popups so script.js can show
-             friendlier messages instead. -->
         <form class="notify-form" id="notify-form" novalidate>
           <div class="field">
             <label for="name">Name <span class="optional">(optional)</span></label>
@@ -192,62 +178,100 @@
           <div class="field field-checkbox">
             <input type="checkbox" id="consent" name="consent" required aria-describedby="consent-error">
             <label for="consent">
-              I agree to receive emails from Elen Sunglasses about the launch. I can unsubscribe at any time.
+              I agree to receive emails from Elen Sunglasses. I can unsubscribe at any time.
             </label>
             <p class="field-error" id="consent-error" aria-live="polite"></p>
           </div>
 
-          <button type="submit" class="btn btn-primary">Notify me</button>
+          <button type="submit" class="btn btn-primary">Sign up</button>
         </form>
 
-        <!-- Shown after a successful submit (hidden until then). -->
         <div class="form-success" id="form-success" hidden tabindex="-1">
           <h3>Thanks, you're on the list.</h3>
-          <p>We'll send one email when the collection is live. That's it.</p>
+          <p>We'll write when there's something new. Not before.</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ================= 5. FOOTER ================= -->
+  <!-- ================= FOOTER ================= -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
         <p class="logo">Elen</p>
-        <p class="footer-small">Sunglasses, designed in Europe.</p>
+        <p class="footer-small">Luxury sunglasses, designed in Europe.</p>
       </div>
 
       <ul class="footer-links">
-        <!-- Replace with your Instagram URL -->
+        <!-- Replace with your Instagram URL and contact email -->
         <li><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
-        <!-- Replace with your contact email -->
         <li><a href="mailto:hello@example.com">hello@example.com</a></li>
       </ul>
 
+      <!-- EU online shops need these pages. Point each link to your own page. -->
+      <ul class="footer-links footer-legal">
+        <li><a href="#">Shipping &amp; returns</a></li>
+        <li><a href="#">Terms of sale</a></li>
+        <li><a href="#">Privacy policy</a></li>
+        <li><a href="#">Legal notice</a></li>
+      </ul>
+
       <p class="footer-gdpr">
-        We only use your email to tell you about the Elen launch. We don't sell or share it.
-        You can unsubscribe at any time, or write to us and we'll delete your data. This site
-        doesn't use tracking cookies.
+        We use your email only to send you Elen news, and your order details only to deliver your order.
+        We don't sell or share your data. Write to us any time and we'll delete it.
+        The shopping bag is saved in your browser; we don't use tracking cookies.
       </p>
+
+      <!-- Photo credits: remove once you use your own photos -->
+      <p class="footer-small">Placeholder photos from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.</p>
 
       <p class="footer-small">© <span id="year">2026</span> Elen Sunglasses</p>
     </div>
   </footer>
 
-  <!-- ================= LIGHTBOX =================
-       A native <dialog> element. script.js fills in the image and caption. -->
-  <dialog class="lightbox" id="lightbox" aria-label="Enlarged sunglasses image">
-    <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
-    <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous model">&#8249;</button>
-    <figure>
-      <img src="" alt="" id="lightbox-img">
-      <figcaption id="lightbox-caption"></figcaption>
-    </figure>
-    <button class="lightbox-nav lightbox-next" type="button" aria-label="Next model">&#8250;</button>
+  <!-- ================= PRODUCT QUICK VIEW =================
+       A native <dialog>. script.js fills it in when a product is clicked. -->
+  <dialog class="quickview" id="quickview" aria-labelledby="qv-name">
+    <button class="dialog-close" type="button" aria-label="Close">&times;</button>
+    <div class="quickview-inner">
+      <div class="quickview-media">
+        <img src="" alt="" id="qv-img">
+      </div>
+      <div class="quickview-text">
+        <p class="eyebrow" id="qv-colour"></p>
+        <h2 class="qv-name" id="qv-name"></h2>
+        <p class="qv-price" id="qv-price"></p>
+        <p id="qv-desc"></p>
+        <ul class="qv-details" id="qv-details"></ul>
+        <button type="button" class="btn btn-primary" id="qv-add">Add to bag</button>
+      </div>
+    </div>
   </dialog>
 
-  <!-- defer = load the script without blocking the page -->
+  <!-- ================= SHOPPING BAG (slides in from the right) ================= -->
+  <dialog class="bag" id="bag" aria-labelledby="bag-title">
+    <div class="bag-head">
+      <h2 id="bag-title">Your bag</h2>
+      <button class="dialog-close" type="button" aria-label="Close bag">&times;</button>
+    </div>
+
+    <ul class="bag-items" id="bag-items"></ul>
+    <p class="bag-empty" id="bag-empty">Your bag is empty.</p>
+
+    <div class="bag-foot" id="bag-foot">
+      <p class="bag-total"><span>Subtotal</span> <span id="bag-subtotal">€0</span></p>
+      <p class="bag-small">Including VAT. Shipping is free within the EU.</p>
+      <button type="button" class="btn btn-primary btn-block" id="checkout-button">Checkout</button>
+      <p class="bag-message" id="bag-message" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <!-- Small pop-up message ("Added to bag") -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- products.js must load before script.js -->
+  <script src="products.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
