@@ -139,6 +139,19 @@
       </div>
     </section>
 
+    <!-- ================= PURTAȚI DE VOI =================
+         Recenziile și pozele trimise de clienți, după ce le aprobi în admin.html.
+         Secțiunea rămâne ascunsă până există cel puțin o recenzie aprobată. -->
+    <section class="reviews section" id="recenzii" hidden>
+      <div class="container">
+        <div class="fade-in">
+          <p class="eyebrow">Recenzii</p>
+          <h2 class="section-title">Purtați de voi</h2>
+        </div>
+        <ul class="review-grid" id="review-grid"></ul>
+      </div>
+    </section>
+
     <!-- ================= CUM FUNCȚIONEAZĂ PRECOMANDA =================
          [EDIT ME] Răspunsurile de mai jos sunt promisiuni față de client.
          Păstrează doar ce poți respecta și copiază-le și în Termeni și condiții. -->
@@ -330,7 +343,8 @@
       <p class="footer-gdpr">
         Folosim emailul tău doar ca să-ți trimitem noutăți Elen, iar datele de comandă doar ca să livrăm comanda.
         Nu vindem și nu dăm datele mai departe. Scrie-ne oricând și le ștergem.
-        Coșul e salvat în browserul tău; nu folosim cookie-uri de urmărire.
+        Coșul e salvat în browserul tău; nu folosim cookie-uri de urmărire. Dacă ne lași emailul în coș, îl păstrăm
+        cel mult 14 zile, ca să ți-l putem trimite. Fiecare email are un link de dezabonare.
       </p>
 
       <!-- [EDIT ME] Datele firmei sunt obligatorii pe un magazin online -->
@@ -388,6 +402,16 @@
         <legend>Cum plătești?</legend>
         <div id="pay-options"></div>
       </fieldset>
+
+      <!-- Apare doar când agentul de vânzări e pornit (EMAILURI.activ în script.js) -->
+      <div class="bag-email" id="bag-email" hidden>
+        <label for="bag-email-input">Email <span class="optional">(îl folosim și la plată)</span></label>
+        <input type="email" id="bag-email-input" autocomplete="email" inputmode="email" placeholder="nume@exemplu.ro">
+        <label class="bag-consent">
+          <input type="checkbox" id="bag-email-consent">
+          <span>Păstrează-mi coșul. Dacă nu termin acum, trimite-mi-l pe email (cel mult 3 emailuri).</span>
+        </label>
+      </div>
 
       <button type="button" class="btn btn-primary btn-block" id="checkout-button">Precomandă</button>
       <p class="bag-message" id="bag-message" aria-live="polite"></p>

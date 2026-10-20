@@ -12,6 +12,21 @@ api/checkout.js     plata prin Stripe (integral sau avans)
 api/rezervari.js    contorul de rezervări, numărat din plățile Stripe
 api/_stripe.js      cod comun pentru cele două de mai sus
 images/             pozele tale + desenele folosite până le urci
+
+agent.js            AGENTUL DE VÂNZĂRI: setări și textele emailurilor
+api/_agent.js       ce face agentul la fiecare rulare (nu trebuie atins)
+api/agent.js        pornirea agentului (o apelează Vercel Cron și GitHub Actions)
+api/cos.js          coșul lăsat pe email
+api/abonare.js      formularul „Lista Elen”
+api/recenzie.js     formularul de recenzie
+api/recenzii.js     recenziile aprobate și pozele lor, pentru site
+api/admin.js        pagina de admin
+api/dezabonare.js   linkul de dezabonare din emailuri
+api/_db.js, api/_email.js   baza de date și trimiterea emailurilor
+recenzie.html       pagina unde clientul scrie recenzia și urcă poza
+admin.html          aprobi recenzii, vezi vânzările recuperate, previzualizezi emailurile
+vercel.json         pornirea zilnică a agentului
+.github/workflows/agent-vanzari.yml   pornirea agentului la fiecare 30 de minute
 ```
 
 ## Înainte de prima comandă reală
@@ -126,7 +141,76 @@ După ce livrezi prima serie, site-ul poate redeveni magazin obișnuit, cu stoc,
 
 ## Formularul de abonare
 
-Arată mesajul de mulțumire, dar nu salvează încă adresele. În `script.js`, caută **AICI CONECTEZI SERVICIUL DE EMAIL** (Formspree sau Mailchimp).
+Cu agentul de vânzări pornit (mai jos), adresele se salvează singure și abonații primesc emailurile despre lansări. Altfel formularul doar arată mesajul de mulțumire; în `script.js`, caută **AICI CONECTEZI SERVICIUL DE EMAIL** (Formspree sau Mailchimp).
+
+## Agentul de vânzări
+
+Lucrează singur, după ce clientul a plecat de pe site sau a cumpărat deja:
+
+| Când | Cui | Ce primește |
+|---|---|---|
+| La 1 oră, 24 de ore și 3 zile după ce a lăsat coșul | cine și-a lăsat emailul în coș și a bifat „Păstrează-mi coșul” | „Modelul Sola încă te așteaptă”, apoi cum merge avansul și câte locuri mai sunt, apoi garanțiile (anulare, retur). Butonul pune coșul înapoi exact cum era, chiar și pe alt telefon. |
+| La 10 zile după livrare | clienții | cerere de recenzie și o poză cu ochelarii purtați. Tu aprobi ce apare pe site. |
+| Când lansezi un model (datele `accesAbonati` / `lansare` din `products.js`) | clienții și abonații | anunțul, cu linkul de acces anticipat. Clienții află și cum se compară mărimea cu rama pe care o au, plus două rame potrivite cu ce au cumpărat. |
+| La 45 de zile după livrare | clienții | două rame alese după ce au deja: același material, aceeași mărime, culori apropiate. |
+
+Reguli pe care agentul le respectă singur:
+- **Se oprește imediat ce clientul plătește.** Află din Stripe, la fiecare rulare, înainte să trimită ceva.
+- **Un singur email pe rulare** de om și cel mult 3 despre același coș. Un coș nou de la aceeași adresă pornește emailurile din nou abia după 14 zile.
+- **Nu scrie despre ce nu se mai poate cumpăra**: modelele cu seria rezervată complet sunt scoase din emailuri și din recomandări.
+- **Fiecare email are link de dezabonare** (și butonul „Dezabonează-te” din Gmail). Cine se dezabonează nu mai primește nimic.
+- **Nu cere recenzii înainte de livrare.** Când trimiți prima serie, completează `PRECOMANDA.livrataPe` în `products.js` (de exemplu `'2027-03-10'`).
+
+Orele, zilele și textele emailurilor se schimbă în `agent.js`. În `admin.html` vezi cum arată fiecare email înainte să-l trimită cineva.
+
+### Pornește agentul
+
+1. **Baza de date.** În Vercel: proiect → Storage → Create → **Upstash for Redis** (planul gratuit ajunge) → Connect. Vercel adaugă singur `KV_REST_API_URL` și `KV_REST_API_TOKEN`.
+2. **Emailurile.** Fă cont pe [resend.com](https://resend.com), adaugă domeniul la Domains și pune înregistrările DNS pe care ți le arată (fără asta emailurile ajung în spam). Apoi API Keys → creează o cheie.
+3. **Variabilele din Vercel** (Settings → Environment Variables):
+
+   | Variabilă | Ce pui |
+   |---|---|
+   | `RESEND_API_KEY` | cheia din Resend |
+   | `EMAIL_FROM` | `Elen Sunglasses <salut@domeniul-tau.ro>` |
+   | `EMAIL_REPLY_TO` | (opțional) adresa unde vrei răspunsurile clienților |
+   | `EMAIL_ADMIN` | (opțional) adresa ta, ca să afli de fiecare recenzie nouă |
+   | `CRON_SECRET` | un text lung și întâmplător, de exemplu din [1password.com/password-generator](https://1password.com/password-generator). Nu-l schimba după ce pornești: semnează linkurile din emailuri. |
+   | `ADMIN_PAROLA` | parola pentru `admin.html`, minim 8 caractere |
+   | `SITE_URL` | `https://domeniul-tau.ro` |
+
+   Agentul are nevoie și de `STRIPE_SECRET_KEY` (ca să știe cine a cumpărat) și, pentru acces anticipat la lansări, de `ACCES_ANTICIPAT_COD`. Le ai deja dacă ai pornit plata.
+4. În `script.js`, sus: `EMAILURI.activ: true`. Commit, push.
+5. Deschide `https://domeniul-tau.ro/admin.html`, intră cu parola și apasă **Simulează**: vezi ce emailuri ar pleca acum, fără să plece nimic. Dacă e totul bifat cu verde, agentul e gata.
+
+Fără `RESEND_API_KEY` și `EMAIL_FROM` agentul doar simulează, deci poți face pașii 1, 3 și 4 și te uiți în admin înainte să trimită ceva cuiva.
+
+### Cât de des rulează
+
+Vercel Cron îl pornește o dată pe zi (`vercel.json`); pe planul gratuit Vercel nu se poate mai des. Ca emailul de „1 oră” să plece la timp, îl pornește și GitHub, la fiecare 30 de minute:
+
+1. Pe GitHub, în repository: Settings → Secrets and variables → Actions.
+2. La **Secrets**: `CRON_SECRET`, cu aceeași valoare ca în Vercel.
+3. La **Variables**: `SITE_URL`, de exemplu `https://domeniul-tau.ro`.
+
+Gata. În tabul Actions vezi fiecare rulare. Dacă repository-ul e privat, cele 30 de minute încap în minutele gratuite GitHub. GitHub oprește acțiunile programate dacă repository-ul nu are niciun commit 60 de zile; atunci apasă „Enable workflow” în Actions. Pe Vercel Pro poți pune în schimb în `vercel.json` `"schedule": "*/15 * * * *"`.
+
+### Recenziile și pozele
+
+Clientul primește linkul pe email, scrie recenzia și urcă poza din telefon (o micșorăm în browser și ștergem din ea locul unde a fost făcută). Recenzia apare în `admin.html` la „Recenzii de aprobat”. Când o aprobi, intră pe site în secțiunea „Purtați de voi”, sub magazin. Secțiunea apare singură de la prima recenzie aprobată.
+
+Pozele aprobate le poți folosi și pe Instagram sau ca poza a treia a produsului: clientul și-a dat acordul pentru site și paginile Elen. Le descarci din admin (click dreapta → Salvează imaginea).
+
+### Ce urmărești
+
+În `admin.html`: câte vânzări au venit după emailurile despre coș și câți lei s-au încasat din ele, câte emailuri a trimis fiecare pas, câte coșuri așteaptă, clienți, abonați, dezabonați. Tot acolo oprești emailurile pentru o anumită adresă, de exemplu după o precomandă anulată.
+
+### Înainte să-l pornești
+
+- [ ] Textul despre anulare și retur din emailul 3 (în `agent.js`) e același cu cel din „Cum funcționează” pe site.
+- [ ] `semnatura` și `firma` din `agent.js` completate (un nume de om la semnătură e citit mai des).
+- [ ] În politica de confidențialitate: coșul păstrat pe email (cel mult 14 zile), emailurile despre modele noi către clienți și abonați, recenziile și pozele publicate cu acord, Resend și Upstash ca furnizori.
+- [ ] Emailurile către clienții vechi se bazează pe faptul că au cumpărat de la tine și au fost anunțați la plată (pe pagina Stripe scrie „Îți putem scrie despre modelele noi Elen; te poți dezabona din orice email”). Verifică cu avocatul că așa e în regulă pentru tine.
 
 ## Texte, culori, fonturi
 

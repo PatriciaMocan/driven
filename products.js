@@ -199,7 +199,9 @@ const PRODUCTS = [
    ========================================================= */
 const PRECOMANDA = {
   livrare: 'martie 2027', // [EDIT ME] când primesc clienții ochelarii. Trebuie să fie o dată pe care o poți ține.
-  avans: 300              // lei per pereche, dacă clientul alege să plătească doar avansul
+  avans: 300,             // lei per pereche, dacă clientul alege să plătească doar avansul
+  livrataPe: ''           // [EDIT ME] data la care ai trimis prima serie, de ex. '2027-03-10'.
+                          // Până o completezi, agentul nu cere recenzii (clienții încă n-au ochelarii).
 };
 
 // Câte bucăți mai sunt libere în prima serie, știind câte s-au rezervat

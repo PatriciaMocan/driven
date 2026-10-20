@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — Agentul de vânzări Elen</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header is-solid">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Elen</a>
+      <nav class="main-nav"><span>Agentul de vânzări</span></nav>
+    </div>
+  </header>
+
+  <main class="section page-simple">
+    <div class="container">
+
+      <!-- Parola e ADMIN_PAROLA din Vercel. Rămâne în browser doar până închizi tabul. -->
+      <form class="notify-inner" id="login" hidden>
+        <h1 class="section-title">Admin</h1>
+        <div class="field">
+          <label for="parola">Parola (ADMIN_PAROLA din Vercel)</label>
+          <input type="password" id="parola" autocomplete="current-password">
+          <p class="field-error" id="login-eroare"></p>
+        </div>
+        <button class="btn btn-primary" type="submit">Intră</button>
+      </form>
+
+      <div id="panou" hidden>
+        <section class="admin-section">
+          <h1 class="section-title">Agentul de vânzări</h1>
+          <ul class="admin-check" id="configurare"></ul>
+          <div class="admin-grid" id="numere"></div>
+        </section>
+
+        <section class="admin-section">
+          <h2>Recenzii de aprobat</h2>
+          <p class="section-intro">Pe site apar doar cele aprobate, în secțiunea „Purtați de voi”.</p>
+          <ul class="admin-list" id="asteptare"></ul>
+          <h2>Pe site acum</h2>
+          <ul class="admin-list" id="aprobate"></ul>
+        </section>
+
+        <section class="admin-section">
+          <h2>Rulează agentul acum</h2>
+          <p class="section-intro">Agentul rulează singur (vezi README). Simularea îți arată ce ar trimite acum, fără să trimită nimic.</p>
+          <div class="admin-actions">
+            <button class="btn btn-outline btn-small" type="button" data-ruleaza="simulare">Simulează</button>
+            <button class="btn btn-primary btn-small" type="button" data-ruleaza="trimite">Rulează și trimite</button>
+          </div>
+          <h3 class="qv-subtitle">Ultima rulare</h3>
+          <pre class="admin-log" id="rulare">—</pre>
+        </section>
+
+        <section class="admin-section">
+          <h2>Cum arată emailurile</h2>
+          <p class="section-intro">Cu date de exemplu. Textele se schimbă în <code>agent.js</code>.</p>
+          <label class="select">
+            <span class="visually-hidden">Emailul</span>
+            <select id="tip-email">
+              <option value="cos1">Coș abandonat, după 1 oră</option>
+              <option value="cos2">Coș abandonat, după 24 de ore</option>
+              <option value="cos3">Coș abandonat, după 3 zile</option>
+              <option value="recenzie">Cerere de recenzie și poză</option>
+              <option value="lansare">Lansare nouă</option>
+              <option value="recomandare">Recomandări pentru a doua pereche</option>
+            </select>
+          </label>
+          <p id="subiect" class="qv-size-code" style="margin-top:1rem"></p>
+          <iframe class="admin-preview" id="preview" title="Previzualizare email" sandbox=""></iframe>
+        </section>
+
+        <section class="admin-section">
+          <h2>Oprește emailurile pentru cineva</h2>
+          <p class="section-intro">De exemplu pentru o precomandă anulată sau dacă cineva îți cere asta direct.</p>
+          <form class="notify-inner" id="dezabonare">
+            <div class="field">
+              <label for="dez-email">Email</label>
+              <input type="email" id="dez-email" required>
+            </div>
+            <button class="btn btn-outline btn-small" type="submit">Oprește emailurile</button>
+            <p class="field-error" id="dez-mesaj" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const CHEIE = 'elen-admin';
+    let parola = '';
+    try { parola = sessionStorage.getItem(CHEIE) || ''; } catch (e) { /* mod privat */ }
+
+    const NUME_EMAILURI = {
+      cos1: 'Coș, 1 oră', cos2: 'Coș, 24 de ore', cos3: 'Coș, 3 zile',
+      recenzie: 'Cereri de recenzie', lansare: 'Lansări', recomandare: 'Recomandări'
+    };
+    const lei = (n) => new Intl.NumberFormat('ro-RO').format(n) + ' lei';
+    const data = (ms) => new Date(ms).toLocaleString('ro-RO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+    function sigur(text) {
+      const div = document.createElement('div');
+      div.textContent = text == null ? '' : String(text);
+      return div.innerHTML;
+    }
+
+    function mesaj(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('is-visible');
+      setTimeout(() => t.classList.remove('is-visible'), 3000);
+    }
+
+    async function api(cale, optiuni) {
+      const raspuns = await fetch('/api/admin' + (cale || ''), {
+        ...optiuni,
+        headers: { 'Content-Type': 'application/json', 'x-admin': encodeURIComponent(parola) }
+      });
+      const date = await raspuns.json().catch(() => ({}));
+      if (raspuns.status === 401) { iesi(); throw new Error(date.error); }
+      if (!raspuns.ok) throw new Error(date.error || 'Eroare');
+      return date;
+    }
+
+    function iesi() {
+      parola = '';
+      try { sessionStorage.removeItem(CHEIE); } catch (e) { /* ignorăm */ }
+      document.getElementById('panou').hidden = true;
+      document.getElementById('login').hidden = false;
+    }
+
+    // Pozele din recenziile neaprobate nu sunt publice, așa că le cerem cu parola
+    async function incarcaPoze() {
+      for (const img of document.querySelectorAll('img[data-poza]')) {
+        try {
+          const r = await fetch('/api/recenzii?poza=' + img.dataset.poza, { headers: { 'x-admin': encodeURIComponent(parola) } });
+          if (r.ok) img.src = URL.createObjectURL(await r.blob());
+        } catch (e) { /* fără poză */ }
+      }
+    }
+
+    function recenzie(r, butoane) {
+      return `
+        <li class="admin-item">
+          ${r.poza ? `<img data-poza="${r.id}" alt="Poza clientului">` : '<div></div>'}
+          <div>
+            <p><strong>${sigur(r.produs)}</strong> · ${'★'.repeat(r.nota)}${'☆'.repeat(5 - r.nota)} · ${data(r.data)}</p>
+            <p>${sigur(r.text)}</p>
+            <p class="product-meta">${sigur(r.nume)} · ${sigur(r.email)}${r.poza ? '' : ' · fără poză'}</p>
+            <div class="admin-actions">${butoane.map(([act, text]) =>
+              `<button class="btn btn-outline btn-small" type="button" data-actiune="${act}" data-id="${r.id}">${text}</button>`).join('')}</div>
+          </div>
+        </li>`;
+    }
+
+    function arataRulare(r) {
+      if (!r) return '—';
+      const linii = [
+        `${data(Date.parse(r.data))} · ${r.simulare ? 'SIMULARE (nu s-a trimis nimic)' : 'trimis'} · comenzi noi din Stripe: ${r.comenziNoi}`,
+        `Emailuri: ${r.numarEmailuri != null ? r.numarEmailuri : r.emailuri.length}`,
+        ...r.emailuri.map((e) => `  ${NUME_EMAILURI[e.tip] || e.tip} → ${e.catre}: „${e.subiect}”`),
+        ...r.erori.map((e) => 'EROARE: ' + e)
+      ];
+      return linii.join('\n');
+    }
+
+    async function incarca() {
+      const s = await api('');
+      document.getElementById('login').hidden = true;
+      document.getElementById('panou').hidden = false;
+
+      const c = s.configurare;
+      document.getElementById('configurare').innerHTML = [
+        [c.baza, 'Baza de date (Upstash)'],
+        [c.email, 'Trimitere emailuri (RESEND_API_KEY și EMAIL_FROM). Fără ele, agentul doar simulează.'],
+        [c.stripe, 'Stripe (STRIPE_SECRET_KEY): de aici află agentul cine a cumpărat'],
+        [c.cron, 'CRON_SECRET: pornirea automată și linkurile semnate'],
+        [c.accesAnticipat, 'ACCES_ANTICIPAT_COD: clienții primesc acces anticipat la lansări'],
+        [c.emailAdmin, 'EMAIL_ADMIN: primești un email la fiecare recenzie nouă'],
+        [Boolean(c.livrataPe), c.livrataPe ? 'Prima serie livrată pe ' + c.livrataPe + ': se cer recenzii' : 'PRECOMANDA.livrataPe e gol în products.js: nu se cer recenzii încă']
+      ].map(([ok, text]) => `<li class="${ok ? 'da' : 'nu'}">${sigur(text)}</li>`).join('');
+
+      const n = s.numere;
+      document.getElementById('numere').innerHTML = [
+        [s.recuperate.numar, 'vânzări recuperate după emailurile despre coș'],
+        [lei(s.recuperate.lei), 'încasate din ele'],
+        [n.cosuri, 'coșuri cu email care așteaptă'],
+        [n.clienti, 'clienți'],
+        [n.abonati, 'abonați'],
+        [n.dezabonati, 'dezabonați'],
+        ...Object.entries(s.trimise).map(([tip, nr]) => [nr, NUME_EMAILURI[tip] + ' trimise'])
+      ].map(([nr, text]) => `<div class="admin-tile"><strong>${sigur(nr)}</strong><span>${sigur(text)}</span></div>`).join('');
+
+      document.getElementById('asteptare').innerHTML = s.recenzii.asteptare.length
+        ? s.recenzii.asteptare.map((r) => recenzie(r, [['aproba', 'Aprobă'], ['respinge', 'Respinge'], ['sterge', 'Șterge']])).join('')
+        : '<li class="product-meta">Nicio recenzie nouă.</li>';
+      document.getElementById('aprobate').innerHTML = s.recenzii.aprobate.length
+        ? s.recenzii.aprobate.map((r) => recenzie(r, [['respinge', 'Scoate de pe site'], ['sterge', 'Șterge']])).join('')
+        : '<li class="product-meta">Încă nimic.</li>';
+      incarcaPoze();
+
+      document.getElementById('rulare').textContent = arataRulare(s.ultimaRulare);
+    }
+
+    async function previzualizeaza() {
+      try {
+        const p = await api('?previzualizare=' + document.getElementById('tip-email').value);
+        document.getElementById('subiect').textContent = 'Subiect: ' + p.subiect;
+        document.getElementById('preview').srcdoc = p.html;
+      } catch (e) {
+        document.getElementById('subiect').textContent = e.message;
+      }
+    }
+
+    document.getElementById('login').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      parola = document.getElementById('parola').value;
+      try {
+        await incarca();
+        try { sessionStorage.setItem(CHEIE, parola); } catch (e) { /* ignorăm */ }
+        previzualizeaza();
+      } catch (e) {
+        document.getElementById('login').hidden = false;
+        document.getElementById('login-eroare').textContent = e.message || 'Nu merge.';
+      }
+    });
+
+    document.getElementById('panou').addEventListener('click', async (event) => {
+      const b = event.target.closest('[data-actiune]');
+      if (b) {
+        if (b.dataset.actiune === 'sterge' && !confirm('Ștergi recenzia și poza? Nu se mai pot recupera.')) return;
+        b.disabled = true;
+        try {
+          await api('', { method: 'POST', body: JSON.stringify({ actiune: b.dataset.actiune, id: b.dataset.id }) });
+          mesaj(b.dataset.actiune === 'aproba' ? 'Recenzia apare pe site în câteva minute.' : 'Gata.');
+          await incarca();
+        } catch (e) { mesaj(e.message); b.disabled = false; }
+      }
+
+      const r = event.target.closest('[data-ruleaza]');
+      if (r) {
+        const simulare = r.dataset.ruleaza === 'simulare';
+        if (!simulare && !confirm('Trimite acum emailurile care sunt la rând?')) return;
+        r.disabled = true;
+        document.getElementById('rulare').textContent = 'Rulează…';
+        try {
+          const raport = await api('', { method: 'POST', body: JSON.stringify({ actiune: 'ruleaza', simulare }) });
+          document.getElementById('rulare').textContent = arataRulare(raport);
+          if (!simulare) incarca();
+        } catch (e) { document.getElementById('rulare').textContent = 'EROARE: ' + e.message; }
+        r.disabled = false;
+      }
+    });
+
+    document.getElementById('tip-email').addEventListener('change', previzualizeaza);
+
+    document.getElementById('dezabonare').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const el = document.getElementById('dez-mesaj');
+      try {
+        await api('', { method: 'POST', body: JSON.stringify({ actiune: 'dezaboneaza', email: document.getElementById('dez-email').value }) });
+        el.textContent = 'Gata, nu mai primește emailuri de la agent.';
+        document.getElementById('dez-email').value = '';
+      } catch (e) { el.textContent = e.message; }
+    });
+
+    if (parola) {
+      incarca().then(previzualizeaza).catch(() => iesi());
+    } else {
+      document.getElementById('login').hidden = false;
+    }
+  </script>
+</body>
+</html>

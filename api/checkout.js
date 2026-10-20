@@ -2,7 +2,7 @@
    Precomandă cu plata prin card, prin Stripe (o funcție serverless Vercel)
    Folosită doar când PLATA.card este 'stripe' în script.js.
 
-   Browserul trimite { items: [{ id, qty }], tip: 'integral' | 'avans', acces: 'COD' }. Funcția:
+   Browserul trimite { items: [{ id, qty }], tip: 'integral' | 'avans', acces: 'COD', email? }. Funcția:
      - ia prețurile din products.js (nu din browser)
      - verifică dacă mai sunt locuri în prima serie (din plățile reale din Stripe)
      - verifică codul de acces anticipat pentru modelele încă nelansate
@@ -17,6 +17,7 @@
 
 const { PRODUCTS, PRECOMANDA, locuriLibere, etapaLansare } = require('../products.js');
 const { stripe, numaraRezervari } = require('./_stripe.js');
+const { emailValid, normalizeaza } = require('./_email.js');
 
 const MAX_BUCATI = 10; // aceeași limită ca în script.js
 
@@ -96,9 +97,11 @@ module.exports = async (req, res) => {
     form.append('cancel_url', `${origin}/?plata=anulata`);
     form.append('shipping_address_collection[allowed_countries][0]', 'RO'); // livrăm doar în România
     form.append('phone_number_collection[enabled]', 'true');                // curierul are nevoie de telefon
-    form.append('custom_text[submit][message]', avans
+    // Ultima frază îi spune clientului că agentul de vânzări îi poate scrie despre modele noi (vezi README)
+    form.append('custom_text[submit][message]', (avans
       ? `Plătești acum avansul. Restul de ${restDePlata.toLocaleString('ro-RO')} lei îl plătești la livrare, în ${PRECOMANDA.livrare}.`
-      : `Precomandă: livrare în ${PRECOMANDA.livrare}.`);
+      : `Precomandă: livrare în ${PRECOMANDA.livrare}.`) +
+      ' Îți putem scrie despre modelele noi Elen; te poți dezabona din orice email.');
 
     // Folosite de contorul de rezervări și ca să știi ce ai de livrat și de încasat
     form.append('metadata[elen_produse]', produseComandate.join(','));
@@ -106,6 +109,13 @@ module.exports = async (req, res) => {
     form.append('metadata[rest_de_plata_lei]', String(restDePlata));
     form.append('metadata[livrare]', PRECOMANDA.livrare);
     if (areAcces) form.append('metadata[acces_anticipat]', 'da');
+
+    // Emailul lăsat în coș: completat deja pe pagina de plată, iar agentul de vânzări
+    // știe că acel coș s-a plătit și nu mai trimite emailuri despre el
+    if (emailValid(body.email)) {
+      form.append('customer_email', normalizeaza(body.email));
+      form.append('metadata[cos_email]', normalizeaza(body.email));
+    }
 
     const sesiune = await stripe('checkout/sessions', { method: 'POST', body: form });
     return res.status(200).json({ url: sesiune.url });

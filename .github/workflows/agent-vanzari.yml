@@ -1,0 +1,30 @@
+# Pornește agentul de vânzări la fiecare 30 de minute, ca emailul de „1 oră”
+# să plece la timp. (Vercel Cron, pe planul gratuit, rulează doar o dată pe zi.)
+#
+# Setare, o singură dată, pe GitHub: Settings → Secrets and variables → Actions
+#   Secrets   → CRON_SECRET  = aceeași valoare ca în Vercel
+#   Variables → SITE_URL     = https://domeniul-tau.ro
+# Până le pui, acțiunea nu face nimic.
+
+name: Agentul de vânzări
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ruleaza:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Pornește agentul
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$SITE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "SITE_URL sau CRON_SECRET lipsesc. Vezi README, „Agentul de vânzări”."
+            exit 0
+          fi
+          curl -fsS --max-time 90 -H "Authorization: Bearer $CRON_SECRET" "${SITE_URL%/}/api/agent"

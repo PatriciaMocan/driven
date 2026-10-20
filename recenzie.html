@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recenzia ta — Elen Sunglasses</title>
+  <!-- Pagina se deschide doar din linkul primit pe email după livrare -->
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F7F4EE">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header is-solid">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="Elen Sunglasses, pagina principală">Elen</a>
+      <nav class="main-nav" aria-label="Meniu principal">
+        <a href="index.html#magazin">Magazin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="section page-simple">
+    <div class="container notify-inner">
+      <p class="eyebrow">Recenzie</p>
+      <h1 class="section-title" id="titlu">Cum îți stă?</h1>
+      <p class="section-intro" id="intro">Un minut, și o poză dacă ai una.</p>
+
+      <p class="field-error" id="eroare-link" hidden></p>
+
+      <form class="review-form" id="review-form" novalidate hidden>
+        <!-- Completat din comanda clientului -->
+        <fieldset class="choice-row" id="produse"><legend>Despre ce ramă scrii?</legend></fieldset>
+
+        <fieldset class="choice-row stars">
+          <legend>Ce notă îi dai?</legend>
+          <label class="choice"><input type="radio" name="nota" value="1"><span aria-label="1 din 5">1 ★</span></label>
+          <label class="choice"><input type="radio" name="nota" value="2"><span aria-label="2 din 5">2 ★</span></label>
+          <label class="choice"><input type="radio" name="nota" value="3"><span aria-label="3 din 5">3 ★</span></label>
+          <label class="choice"><input type="radio" name="nota" value="4"><span aria-label="4 din 5">4 ★</span></label>
+          <label class="choice"><input type="radio" name="nota" value="5"><span aria-label="5 din 5">5 ★</span></label>
+        </fieldset>
+
+        <div class="field">
+          <label for="text">Recenzia ta</label>
+          <textarea id="text" name="text" maxlength="1500"
+                    placeholder="Cum stă pe nas, cum e lentila în soare, ce ți-a plăcut și ce nu."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="nume">Numele care apare lângă recenzie</label>
+          <input type="text" id="nume" name="nume" maxlength="40" autocomplete="name">
+        </div>
+
+        <div class="field">
+          <span class="field-label">Poză cu ochelarii purtați <span class="optional">(opțional)</span></span>
+          <label class="photo-drop" id="photo-drop">
+            <input type="file" id="poza" accept="image/*">
+            <img id="poza-preview" alt="Poza ta" hidden>
+            <span id="poza-text">Alege o poză de pe telefon sau calculator</span>
+          </label>
+        </div>
+
+        <div class="field field-checkbox">
+          <input type="checkbox" id="acord">
+          <label for="acord">
+            Sunt de acord ca Elen Sunglasses să publice recenzia și poza pe site și pe paginile Elen,
+            cu numele ales mai sus. Pot cere oricând să fie scoase.
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="trimite">Trimite recenzia</button>
+        <p class="field-error" id="eroare" aria-live="polite"></p>
+      </form>
+
+      <div class="form-success" id="multumim" hidden tabindex="-1">
+        <h3>Mulțumim!</h3>
+        <p>Am primit recenzia. O citim și, cu acordul tău, apare pe site în câteva zile.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = new URLSearchParams(location.search).get('t') || '';
+    const form = document.getElementById('review-form');
+    const eroare = document.getElementById('eroare');
+    const preview = document.getElementById('poza-preview');
+    let poza = '';
+
+    function arataEroareLink(text) {
+      const el = document.getElementById('eroare-link');
+      el.textContent = text;
+      el.hidden = false;
+      document.getElementById('intro').hidden = true;
+    }
+
+    function sigur(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function porneste() {
+      if (!token) return arataEroareLink('Deschide pagina din linkul primit pe email.');
+      try {
+        const raspuns = await fetch('/api/recenzie?t=' + encodeURIComponent(token));
+        const date = await raspuns.json();
+        if (!raspuns.ok) return arataEroareLink(date.error || 'Linkul nu mai merge.');
+
+        const produse = date.produse;
+        document.getElementById('titlu').textContent = (date.prenume ? date.prenume + ', c' : 'C') +
+          'um îți stă ' + (produse.length === 1 ? produse[0].nume : 'perechea Elen') + '?';
+        document.getElementById('nume').value = date.nume || '';
+        document.getElementById('produse').insertAdjacentHTML('beforeend', produse.map((p, i) => `
+          <label class="choice"><input type="radio" name="produs" value="${p.id}" ${i === 0 ? 'checked' : ''}>
+            <span>${sigur(p.nume)} · ${sigur(p.culoare)}${p.scrisa ? ' (scrisă)' : ''}</span></label>`).join(''));
+        document.getElementById('produse').hidden = produse.length < 2;
+        form.hidden = false;
+      } catch (e) {
+        arataEroareLink('Pagina nu s-a încărcat. Încearcă din nou peste un minut.');
+      }
+    }
+
+    /* Micșorăm poza în browser (cel mult 1400 px, JPG), ca să se încarce repede.
+       Așa dispar și datele ascunse din poză, de exemplu locul unde a fost făcută. */
+    async function micsoreaza(fisier) {
+      const url = URL.createObjectURL(fisier);
+      try {
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+        const k = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.naturalWidth * k);
+        canvas.height = Math.round(img.naturalHeight * k);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        let calitate = 0.85;
+        let date = canvas.toDataURL('image/jpeg', calitate);
+        while (date.length > 850000 && calitate > 0.45) {
+          calitate -= 0.1;
+          date = canvas.toDataURL('image/jpeg', calitate);
+        }
+        return date;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    document.getElementById('poza').addEventListener('change', async (event) => {
+      const fisier = event.target.files[0];
+      if (!fisier) return;
+      const text = document.getElementById('poza-text');
+      text.textContent = 'Se pregătește poza…';
+      try {
+        poza = await micsoreaza(fisier);
+        preview.src = poza;
+        preview.hidden = false;
+        text.textContent = 'Altă poză? Apasă aici.';
+      } catch (e) {
+        poza = '';
+        preview.hidden = true;
+        text.textContent = 'Poza asta nu s-a putut deschide. Încearcă una JPG sau PNG.';
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      eroare.textContent = '';
+      const nota = form.querySelector('[name="nota"]:checked');
+      const produs = form.querySelector('[name="produs"]:checked');
+      const text = document.getElementById('text').value.trim();
+      const nume = document.getElementById('nume').value.trim();
+      if (!nota) { eroare.textContent = 'Alege o notă de la 1 la 5.'; return; }
+      if (text.length < 3) { eroare.textContent = 'Scrie câteva cuvinte.'; document.getElementById('text').focus(); return; }
+      if (!nume) { eroare.textContent = 'Scrie numele care să apară lângă recenzie.'; document.getElementById('nume').focus(); return; }
+      if (!document.getElementById('acord').checked) { eroare.textContent = 'Bifează acordul ca să putem publica recenzia.'; return; }
+
+      const buton = document.getElementById('trimite');
+      buton.disabled = true;
+      buton.textContent = 'Se trimite…';
+      try {
+        const raspuns = await fetch('/api/recenzie', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ t: token, produs: produs && produs.value, nota: Number(nota.value), text, nume, poza, acord: true })
+        });
+        const date = await raspuns.json().catch(() => ({}));
+        if (!raspuns.ok) throw new Error(date.error || 'Nu s-a putut trimite.');
+        form.hidden = true;
+        document.getElementById('multumim').hidden = false;
+        document.getElementById('multumim').focus();
+      } catch (e) {
+        eroare.textContent = e.message === 'Failed to fetch' ? 'Nu s-a putut trimite. Încearcă din nou.' : e.message;
+        buton.disabled = false;
+        buton.textContent = 'Trimite recenzia';
+      }
+    });
+
+    porneste();
+  </script>
+</body>
+</html>

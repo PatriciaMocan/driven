@@ -10,6 +10,7 @@
    8. Plata cu cardul prin Stripe
    9. Formularul de abonare
   10. Animații la scroll, data livrării, anul din subsol
+  11. Agentul de vânzări: coșul păstrat pe email, recenziile clienților
 
    Data livrării și avansul se schimbă în products.js (PRECOMANDA).
    ========================================================= */
@@ -22,6 +23,14 @@
                (ai nevoie de STRIPE_SECRET_KEY în Vercel, vezi README) */
 const PLATA = {
   card: 'demo'
+};
+
+/* Agentul care recuperează vânzări (vezi README, „Agentul de vânzări”):
+     false   coșul nu cere email, recenziile nu apar, abonarea doar afișează mulțumirea
+     true    coșul poate fi păstrat pe email, abonații se salvează, apar recenziile aprobate
+             (ai nevoie de baza de date Upstash și de Resend, configurate în Vercel) */
+const EMAILURI = {
+  activ: false
 };
 
 
@@ -316,9 +325,29 @@ const bagDialog = document.getElementById('bag');
 const bagItems = document.getElementById('bag-items');
 const bagMessage = document.getElementById('bag-message');
 const payOptions = document.getElementById('pay-options');
+// Emailul din coș, pentru agentul de vânzări (secțiunea 11)
+const bagEmail = document.getElementById('bag-email');
+const bagEmailInput = document.getElementById('bag-email-input');
+const bagEmailConsent = document.getElementById('bag-email-consent');
+const EMAIL_KEY = 'elen-email';
+const ACORD_KEY = 'elen-email-acord';
+let acordTrimis = citesteLocal(ACORD_KEY) === 'da';
+let timerCos;
+bagEmailInput.value = citesteLocal(EMAIL_KEY) || '';
+bagEmailConsent.checked = acordTrimis;
 const BAG_KEY = 'elen-cos';
 let cos = incarcaCos();
 let tipPlata = 'avans'; // 'avans' sau 'integral'
+
+/* Linkul din emailurile despre coș: /?cos=sola:1,lido:2#cos
+   Pune coșul înapoi exact cum era, chiar și pe alt telefon sau calculator. */
+if (parametri.get('cos')) {
+  const dinLink = parametri.get('cos').split(',').map((bucata) => {
+    const [id, qty] = bucata.split(':');
+    return { id: id, qty: Math.min(MAX_BUCATI, Math.floor(Number(qty)) || 0) };
+  }).filter((item) => gasesteProdus(item.id) && item.qty > 0);
+  if (dinLink.length) cos = dinLink;
+}
 
 function incarcaCos() {
   try {
@@ -332,6 +361,7 @@ function incarcaCos() {
 
 function salveazaCos() {
   scrieLocal(BAG_KEY, JSON.stringify(cos));
+  pastreazaCosPeEmail();
 }
 
 // Câte bucăți se pot precomanda dintr-un produs
@@ -468,12 +498,13 @@ checkoutButton.addEventListener('click', async () => {
 
   checkoutButton.disabled = true;
   checkoutButton.textContent = 'Un moment…';
+  await pastreazaCosPeEmail(true);
   try {
     // Trimitem doar id-uri, cantități și felul plății. Prețul și locurile sunt verificate pe server.
     const raspuns = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: cos, tip: tipPlata, acces: codAcces })
+      body: JSON.stringify({ items: cos, tip: tipPlata, acces: codAcces, email: emailCos() })
     });
     const date = await raspuns.json();
     if (!raspuns.ok || !date.url) throw new Error(date.error || 'Eroare la plată');
@@ -494,7 +525,7 @@ if (rezultatPlata === 'reusita') {
   salveazaCos();
   arataMesaj('Mulțumim! Precomanda e confirmată. Îți scriem pe email înainte de livrare.');
 }
-if (rezultatPlata || parametri.get('acces')) {
+if (rezultatPlata || parametri.get('acces') || parametri.get('cos')) {
   // Curățăm adresa, ca un refresh să nu repete mesajul
   history.replaceState(null, '', window.location.pathname + window.location.hash);
 }
@@ -574,7 +605,23 @@ form.addEventListener('submit', async (event) => {
      În Mailchimp: Audience > Signup forms > Embedded forms, copiază adresa din „action”,
      pune-o în <form action="..."> din index.html, redenumește câmpurile în EMAIL și FNAME
      și șterge linia event.preventDefault() de mai sus, ca browserul să trimită direct la Mailchimp.
+
+     --- Varianta C: agentul de vânzări (EMAILURI.activ = true) ---
+     Adresa se salvează în baza de date a agentului, care le scrie abonaților la fiecare lansare.
   */
+  if (EMAILURI.activ) {
+    try {
+      const raspuns = await fetch('/api/abonare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.value.trim(), prenume: form.elements.name.value.trim(), consent: true })
+      });
+      if (!raspuns.ok) throw new Error('Request failed');
+    } catch (error) {
+      setError(emailInput, emailError, 'Ceva n-a mers. Încearcă din nou peste un minut.');
+      return;
+    }
+  }
 
   form.hidden = true;
   successBox.hidden = false;
@@ -605,7 +652,83 @@ document.querySelectorAll('[data-avans]').forEach((el) => { el.textContent = num
 document.getElementById('year').textContent = new Date().getFullYear();
 
 
+/* ---------- 11. Agentul de vânzări ----------
+   Coșul păstrat pe email: dacă clientul își lasă emailul și bifează căsuța,
+   coșul ajunge la api/cos.js. Agentul îi scrie la 1 oră, 24 de ore și 3 zile
+   dacă nu plătește, și se oprește singur după plată. */
+bagEmail.hidden = !EMAILURI.activ;
+
+function emailCos() {
+  const email = bagEmailInput.value.trim();
+  return isValidEmail(email) ? email : '';
+}
+
+// imediat = true înainte de plată, ca să nu pierdem coșul dacă pagina se schimbă
+function pastreazaCosPeEmail(imediat) {
+  clearTimeout(timerCos);
+  const email = emailCos();
+  // Fără acord nu salvăm nimic. Dacă și-a retras acordul, trimitem un coș gol, care oprește emailurile.
+  if (!EMAILURI.activ || !email || !(bagEmailConsent.checked || acordTrimis)) return Promise.resolve();
+  const trimite = () => {
+    acordTrimis = bagEmailConsent.checked;
+    return fetch('/api/cos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, items: bagEmailConsent.checked ? cos : [] }),
+      keepalive: true
+    }).catch(() => { /* coșul rămâne oricum în browser */ });
+  };
+  if (imediat) return trimite();
+  timerCos = setTimeout(trimite, 800);
+  return Promise.resolve();
+}
+
+bagEmailInput.addEventListener('change', () => {
+  scrieLocal(EMAIL_KEY, emailCos());
+  pastreazaCosPeEmail();
+});
+bagEmailConsent.addEventListener('change', () => {
+  scrieLocal(ACORD_KEY, bagEmailConsent.checked ? 'da' : '');
+  if (bagEmailConsent.checked && !emailCos()) bagEmailInput.focus();
+  pastreazaCosPeEmail();
+});
+
+/* Recenziile aprobate în admin.html, cu pozele clienților */
+const reviewGrid = document.getElementById('review-grid');
+
+function textSigur(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+async function incarcaRecenzii() {
+  if (!EMAILURI.activ) return;
+  try {
+    const raspuns = await fetch('/api/recenzii');
+    const date = await raspuns.json();
+    if (!raspuns.ok || !date.recenzii || date.recenzii.length === 0) return;
+    reviewGrid.innerHTML = date.recenzii.map((r) => `
+      <li class="review-card">
+        ${r.poza ? `<img src="${r.poza}" alt="${textSigur(r.nume)} poartă ${textSigur(r.numeProdus)}" width="800" height="1000" loading="lazy" decoding="async">` : ''}
+        <p class="review-stars" aria-label="${r.nota} din 5">${'★'.repeat(r.nota)}${'☆'.repeat(5 - r.nota)}</p>
+        <blockquote class="review-text">${textSigur(r.text)}</blockquote>
+        <p class="review-author">${textSigur(r.nume)}${gasesteProdus(r.produs)
+          ? `, despre <button type="button" class="review-product" data-view="${r.produs}">${textSigur(r.numeProdus)}</button>` : ''}</p>
+      </li>`).join('');
+    document.getElementById('recenzii').hidden = false;
+  } catch (e) { /* fără recenzii, secțiunea rămâne ascunsă */ }
+}
+
+reviewGrid.addEventListener('click', (event) => {
+  const vezi = event.target.closest('[data-view]');
+  if (vezi) deschideProdus(vezi.dataset.view);
+});
+
+
 /* ---------- Pornire ---------- */
 afiseazaProduse();
 afiseazaCos();
 incarcaRezervari();
+incarcaRecenzii();
+if (parametri.get('cos')) salveazaCos(); // coșul venit din email rămâne salvat

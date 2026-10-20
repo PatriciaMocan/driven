@@ -766,3 +766,108 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
 @media (min-width: 900px) {
   .preorder-steps { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
 }
+
+/* ---------- 19. Agentul de vânzări: email în coș, recenzii ---------- */
+.bag-email { margin: 0 0 1rem; display: grid; gap: 0.5rem; }
+.bag-email[hidden], .choice-row[hidden] { display: none; }
+.bag-email > label[for] { font-size: 0.875rem; font-weight: 500; }
+.bag-email input[type="email"] {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.75rem 0.9rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+}
+.bag-email input[type="email"]:focus { border-color: var(--color-text); outline: none; }
+.bag-consent { display: flex; gap: 0.6rem; align-items: flex-start; color: var(--color-muted); font-size: 0.8rem; cursor: pointer; }
+.bag-consent input { margin: 0.2rem 0 0; accent-color: var(--color-accent); flex-shrink: 0; }
+
+.reviews { border-top: 1px solid var(--color-line); }
+.review-grid { display: grid; gap: 2.5rem 1.5rem; }
+.review-card img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: var(--color-beige); margin-bottom: 1rem; }
+.review-stars { color: var(--color-accent); letter-spacing: 0.15em; margin: 0 0 0.5rem; }
+.review-text { margin: 0 0 0.75rem; font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.35; }
+.review-author { font-size: 0.85rem; color: var(--color-muted); margin: 0; }
+.review-product {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--color-text); text-decoration: underline; text-underline-offset: 3px; font-size: inherit;
+}
+
+@media (min-width: 600px) {
+  .review-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .review-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Pagini fără poză sus (recenzie.html, admin.html): antetul are text închis la culoare */
+.site-header.is-solid { position: static; color: var(--color-text); border-bottom: 1px solid var(--color-line); }
+.page-simple { padding-top: 3rem; }
+
+/* recenzie.html */
+.review-form { margin-top: 2rem; }
+.review-form textarea {
+  width: 100%;
+  min-height: 9rem;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+.review-form textarea:focus { border-color: var(--color-text); outline: none; }
+.choice-row { display: flex; flex-wrap: wrap; gap: 0.5rem; border: 0; padding: 0; margin: 0 0 1.5rem; }
+.choice-row legend { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.4rem; }
+.choice { position: relative; }
+.choice input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.choice span {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-line);
+  background: #fff;
+  cursor: pointer;
+}
+.choice input:checked + span { border-color: var(--color-text); background: var(--color-text); color: var(--color-bg); }
+.choice input:focus-visible + span { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.stars span { font-size: 1.1rem; line-height: 1; padding: 0.6rem 0.7rem; }
+.field .photo-drop {
+  display: grid;
+  place-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--color-muted);
+  background: #fff;
+  text-align: center;
+  cursor: pointer;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+.photo-drop img { max-height: 320px; width: auto; }
+.photo-drop img[hidden] { display: none; }
+.photo-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+/* admin.html */
+.admin-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); margin: 1.5rem 0 2.5rem; }
+.admin-tile { background: var(--color-beige); padding: 1rem 1.25rem; }
+.admin-tile strong { display: block; font-family: var(--font-serif); font-size: 2rem; font-weight: 500; line-height: 1.1; }
+.admin-tile span { font-size: 0.8rem; color: var(--color-muted); }
+.admin-list { display: grid; gap: 1rem; margin-bottom: 2.5rem; }
+.admin-item { display: grid; gap: 1rem; padding: 1rem; background: #fff; border: 1px solid var(--color-line); }
+.admin-item img { width: 140px; aspect-ratio: 4 / 5; object-fit: cover; background: var(--color-beige); }
+.admin-item p { margin: 0 0 0.4rem; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.admin-check { list-style: none; padding: 0; margin: 0 0 2rem; display: grid; gap: 0.3rem; font-size: 0.9rem; }
+.admin-check .da::before { content: "✓ "; color: #2E7D4F; }
+.admin-check .nu::before { content: "✗ "; color: var(--color-error); }
+.admin-log { font-size: 0.85rem; background: #fff; border: 1px solid var(--color-line); padding: 1rem; overflow-x: auto; }
+.admin-preview { width: 100%; height: 640px; border: 1px solid var(--color-line); background: #fff; }
+.admin-section { margin-bottom: 3rem; }
+.admin-section h2 { font-size: 2rem; margin-bottom: 1rem; }
+@media (min-width: 600px) {
+  .admin-item { grid-template-columns: 140px 1fr; }
+}
+.field-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.4rem; }
