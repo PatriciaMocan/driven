@@ -1,36 +1,27 @@
 /* =========================================================
-   Elen Sunglasses — logica magazinului
+   Elen Sunglasses — logica precomenzilor
    1. SETĂRI PLATĂ  <-- partea pe care o vei modifica cel mai probabil
-   2. Utilitare (prețuri în lei, stoc, poze)
-   3. Acces anticipat pentru abonați
-   4. Lista de produse, filtre și sortare
-   5. Fereastra produsului (poze, stoc, dimensiuni)
-   6. Coșul
-   7. Plata cu cardul (Stripe sau Shopify)
-   8. Comanda cu plata ramburs
+   2. Utilitare (prețuri în lei, texte, mesaje)
+   3. Rezervări din prima serie (contorul „34 din 100”)
+   4. Acces anticipat pentru abonați
+   5. Lista de produse, filtre și sortare
+   6. Fereastra produsului (poze, serie, dimensiuni)
+   7. Coșul și opțiunile de plată (integral sau avans)
+   8. Plata cu cardul prin Stripe
    9. Formularul de abonare
-  10. Animații la scroll și anul din subsol
+  10. Animații la scroll, data livrării, anul din subsol
+
+   Data livrării și avansul se schimbă în products.js (PRECOMANDA).
    ========================================================= */
 
 
 /* ---------- 1. SETĂRI PLATĂ ----------
    card:
      'demo'    nu se încasează nimic, coșul afișează doar un mesaj (implicit, sigur)
-     'stripe'  plata cu cardul prin Stripe, folosind api/checkout.js
-               (ai nevoie de STRIPE_SECRET_KEY în Vercel, vezi README)
-     'shopify' trimite coșul în checkout-ul magazinului tău Shopify
-     'oprit'   ascunde plata cu cardul
-   ramburs:
-     activ         true = clienții pot alege plata la livrare
-     formspreeUrl  adresa formularului Formspree unde ajung comenzile (vezi README).
-                   Cât timp e goală, comanda NU se trimite nicăieri (mod demo). */
+     'stripe'  plata prin Stripe, folosind api/checkout.js
+               (ai nevoie de STRIPE_SECRET_KEY în Vercel, vezi README) */
 const PLATA = {
-  card: 'demo',
-  shopifyDomain: 'magazinul-tau.myshopify.com',
-  ramburs: {
-    activ: true,
-    formspreeUrl: ''
-  }
+  card: 'demo'
 };
 
 
@@ -63,11 +54,9 @@ function bucati(n) {
   return n + (rest === 0 || rest >= 20 ? ' de bucăți' : ' bucăți');
 }
 
-function textStoc(n) {
-  if (n <= 0) return 'Stoc epuizat';
-  if (n === 1) return 'Ultima bucată';
-  if (n <= 3) return 'Ultimele ' + n + ' bucăți';
-  return bucati(n) + ' în stoc';
+// Avansul plătit acum pentru o pereche (niciodată mai mult decât prețul)
+function avansPereche(p) {
+  return Math.min(PRECOMANDA.avans, p.pretPrecomanda);
 }
 
 // Mesaj scurt jos pe ecran
@@ -89,11 +78,51 @@ function scrieLocal(cheie, valoare) {
 }
 
 
-/* ---------- 3. Acces anticipat pentru abonați ----------
+/* ---------- 3. Rezervări din prima serie ----------
+   Pornim de la rezervateManual din products.js. Cu Stripe pornit, cerem
+   numărul real de la api/rezervari.js (plățile reușite) și redesenăm pagina. */
+const rezervate = {};
+PRODUCTS.forEach((p) => { rezervate[p.id] = p.rezervateManual || 0; });
+
+function libere(p) {
+  return locuriLibere(p, rezervate[p.id]);
+}
+
+async function incarcaRezervari() {
+  if (PLATA.card !== 'stripe') return;
+  try {
+    const raspuns = await fetch('/api/rezervari');
+    const date = await raspuns.json();
+    if (!raspuns.ok) return;
+    Object.assign(rezervate, date.rezervate);
+    afiseazaProduse();
+    afiseazaCos();
+  } catch (e) { /* rămânem la numerele din products.js */ }
+}
+
+// „34 din 100 rezervate”, „Ultimele 3 locuri”, „Prima serie: 100 de bucăți”
+function textSerie(p) {
+  const r = rezervate[p.id];
+  const l = libere(p);
+  if (l <= 0) return 'Prima serie s-a rezervat complet';
+  if (l === 1) return 'Ultimul loc din prima serie';
+  if (l <= 5) return 'Ultimele ' + l + ' locuri din prima serie';
+  if (r <= 0) return 'Prima serie: ' + bucati(p.serie);
+  return r + ' din ' + p.serie + ' rezervate';
+}
+
+// Bara de progres a seriei
+function baraSerie(p) {
+  const procent = Math.min(100, Math.round((rezervate[p.id] / p.serie) * 100));
+  return `<span class="serie-bar" aria-hidden="true"><span style="width:${procent}%"></span></span>`;
+}
+
+
+/* ---------- 4. Acces anticipat pentru abonați ----------
    În emailul către abonați trimiți un link de forma
      https://elensunglasses.ro/?acces=CODUL-TAU
-   Codul se salvează în browser. Cu plata prin Stripe, codul e verificat pe server
-   (variabila ACCES_ANTICIPAT_COD din Vercel); la ramburs apare în comandă și îl verifici tu. */
+   Codul se salvează în browser și e verificat pe server la plată
+   (variabila ACCES_ANTICIPAT_COD din Vercel). */
 const ACCES_KEY = 'elen-acces';
 const parametri = new URLSearchParams(window.location.search);
 
@@ -104,26 +133,32 @@ if (parametri.get('acces')) {
 const codAcces = citesteLocal(ACCES_KEY) || '';
 document.getElementById('early-banner').hidden = !codAcces;
 
-// Poate fi cumpărat produsul acum? Întoarce { ok, motiv }
+// Poate fi precomandat produsul acum? Întoarce { ok, motiv }
 function disponibilitate(p) {
   const etapa = etapaLansare(p);
-  if (etapa === 'curand') return { ok: false, motiv: 'Lansare ' + dataRo.format(new Date(p.lansare)) };
+  if (etapa === 'curand') return { ok: false, motiv: 'Precomenzi de pe ' + dataRo.format(new Date(p.lansare)) };
   if (etapa === 'abonati' && !codAcces) return { ok: false, motiv: 'Doar pentru abonați până pe ' + dataRo.format(new Date(p.lansare)) };
-  if (p.stoc <= 0) return { ok: false, motiv: 'Stoc epuizat' };
+  if (libere(p) <= 0) return { ok: false, motiv: 'Prima serie s-a rezervat complet' };
   return { ok: true, motiv: '' };
 }
 
-// Eticheta mică de pe poză: „Acces anticipat”, „În curând”, „Epuizat”
+// Eticheta mică de pe poză
 function eticheta(p) {
   const etapa = etapaLansare(p);
   if (etapa === 'abonati') return codAcces ? 'Acces anticipat' : 'În curând';
   if (etapa === 'curand') return 'În curând';
-  if (p.stoc <= 0) return 'Epuizat';
+  if (libere(p) <= 0) return 'Seria 1 rezervată';
   return '';
 }
 
+// Textul de sub preț: serie sau motivul pentru care nu se poate precomanda
+function textDisponibilitate(p) {
+  const disp = disponibilitate(p);
+  return disp.ok || etapaLansare(p) === 'disponibil' ? textSerie(p) : disp.motiv;
+}
 
-/* ---------- 4. Lista de produse, filtre și sortare ---------- */
+
+/* ---------- 5. Lista de produse, filtre și sortare ---------- */
 const grid = document.getElementById('product-grid');
 const sortSelect = document.getElementById('sort');
 const sizeSelect = document.getElementById('size-filter');
@@ -138,8 +173,8 @@ function afiseazaProduse() {
 
   // Copie, ca ordinea din products.js să rămână „Recomandate”
   lista = lista.slice();
-  if (sortSelect.value === 'pret-cresc') lista.sort((a, b) => a.pret - b.pret);
-  if (sortSelect.value === 'pret-descr') lista.sort((a, b) => b.pret - a.pret);
+  if (sortSelect.value === 'pret-cresc') lista.sort((a, b) => a.pretPrecomanda - b.pretPrecomanda);
+  if (sortSelect.value === 'pret-descr') lista.sort((a, b) => b.pretPrecomanda - a.pretPrecomanda);
 
   document.getElementById('no-results').hidden = lista.length > 0;
 
@@ -147,14 +182,13 @@ function afiseazaProduse() {
     const disp = disponibilitate(p);
     const tag = eticheta(p);
     const d = p.dimensiuni;
-    // Buton: adaugă în coș, abonează-te (modele încă nelansate) sau epuizat
     let buton;
     if (disp.ok) {
-      buton = `<button class="btn btn-outline btn-small" type="button" data-add="${p.id}">Adaugă în coș</button>`;
+      buton = `<button class="btn btn-outline btn-small" type="button" data-add="${p.id}">Precomandă</button>`;
     } else if (etapaLansare(p) !== 'disponibil') {
       buton = `<a class="btn btn-outline btn-small" href="#abonare">Vreau acces anticipat</a>`;
     } else {
-      buton = `<button class="btn btn-outline btn-small" type="button" disabled>Epuizat</button>`;
+      buton = `<a class="btn btn-outline btn-small" href="#abonare">Anunță-mă la seria 2</a>`;
     }
     return `
       <li class="product-card${disp.ok ? '' : ' is-unavailable'}">
@@ -169,12 +203,16 @@ function afiseazaProduse() {
             <h3 class="product-name">${p.nume}</h3>
             <p class="product-colour">${p.culoare}</p>
           </div>
-          <p class="product-price">${lei(p.pret)}</p>
+          <div class="product-prices">
+            <p class="product-price">${lei(p.pretPrecomanda)}</p>
+            <p class="product-later">${lei(p.pret)} după lansare</p>
+          </div>
         </div>
         <p class="product-meta">
           Mărime ${marimeRama(p)} · <span class="nowrap">${d.lentila}□${d.punte}-${d.brat}</span>
         </p>
-        <p class="stock ${p.stoc > 0 && p.stoc <= 3 ? 'is-low' : ''}">${disp.ok || p.stoc <= 0 ? textStoc(p.stoc) : disp.motiv}</p>
+        ${baraSerie(p)}
+        <p class="stock ${libere(p) > 0 && libere(p) <= 5 ? 'is-low' : ''}">${textDisponibilitate(p)}</p>
         <p class="product-short">${p.scurt}</p>
         ${buton}
       </li>`;
@@ -203,7 +241,7 @@ grid.addEventListener('click', (event) => {
 });
 
 
-/* ---------- 5. Fereastra produsului ---------- */
+/* ---------- 6. Fereastra produsului ---------- */
 const quickview = document.getElementById('quickview');
 const qvImg = document.getElementById('qv-img');
 const qvThumbs = document.getElementById('qv-thumbs');
@@ -232,10 +270,12 @@ function deschideProdus(id) {
 
   document.getElementById('qv-colour').textContent = p.culoare;
   document.getElementById('qv-name').textContent = p.nume;
-  document.getElementById('qv-price').textContent = lei(p.pret) + ', TVA inclus';
-  const stoc = document.getElementById('qv-stock');
-  stoc.textContent = disp.ok || p.stoc <= 0 ? textStoc(p.stoc) : disp.motiv;
-  stoc.classList.toggle('is-low', p.stoc > 0 && p.stoc <= 3);
+  document.getElementById('qv-price').innerHTML =
+    lei(p.pretPrecomanda) + ' la precomandă <span class="qv-later">' + lei(p.pret) + ' după lansare · TVA inclus</span>';
+  const serie = document.getElementById('qv-stock');
+  serie.innerHTML = baraSerie(p) + textDisponibilitate(p) +
+    (disp.ok ? '<br>Avans ' + lei(avansPereche(p)) + ' acum, restul la livrare, în ' + PRECOMANDA.livrare + '.' : '');
+  serie.classList.toggle('is-low', libere(p) > 0 && libere(p) <= 5);
   document.getElementById('qv-desc').textContent = p.descriere;
 
   document.getElementById('qv-size-code').textContent =
@@ -246,12 +286,12 @@ function deschideProdus(id) {
     ['Lungime braț', d.brat],
     ['Înălțime lentilă', d.inaltime],
     ['Lățime totală', d.totala]
-  ].map(([eticheta, mm]) => `<tr><th scope="row">${eticheta}</th><td>${mm} mm</td></tr>`).join('');
+  ].map(([nume, mm]) => `<tr><th scope="row">${nume}</th><td>${mm} mm</td></tr>`).join('');
 
   document.getElementById('qv-details').innerHTML = p.detalii.map((x) => `<li>${x}</li>`).join('');
 
   qvAdd.disabled = !disp.ok;
-  qvAdd.textContent = disp.ok ? 'Adaugă în coș' : disp.motiv;
+  qvAdd.textContent = disp.ok ? 'Precomandă' : disp.motiv;
 
   quickview.showModal();
 }
@@ -270,13 +310,15 @@ qvAdd.addEventListener('click', () => {
 document.getElementById('qv-guide-link').addEventListener('click', () => quickview.close());
 
 
-/* ---------- 6. Coșul ----------
+/* ---------- 7. Coșul ----------
    Coșul e o listă de forma [{ id: 'sola', qty: 1 }], salvată în browser. */
 const bagDialog = document.getElementById('bag');
 const bagItems = document.getElementById('bag-items');
 const bagMessage = document.getElementById('bag-message');
+const payOptions = document.getElementById('pay-options');
 const BAG_KEY = 'elen-cos';
 let cos = incarcaCos();
+let tipPlata = 'avans'; // 'avans' sau 'integral'
 
 function incarcaCos() {
   try {
@@ -292,9 +334,9 @@ function salveazaCos() {
   scrieLocal(BAG_KEY, JSON.stringify(cos));
 }
 
-// Câte bucăți se pot comanda dintr-un produs
+// Câte bucăți se pot precomanda dintr-un produs
 function limita(p) {
-  return Math.min(MAX_BUCATI, p.stoc);
+  return Math.min(MAX_BUCATI, libere(p));
 }
 
 function adaugaInCos(id) {
@@ -304,9 +346,9 @@ function adaugaInCos(id) {
 
   const item = cos.find((i) => i.id === id);
   if (item && item.qty >= limita(p)) {
-    arataMesaj(p.stoc <= MAX_BUCATI
-      ? 'Mai avem doar ' + bucati(p.stoc) + ' din ' + p.nume + '.'
-      : 'Online poți comanda cel mult ' + MAX_BUCATI + ' bucăți. Scrie-ne pentru mai multe.');
+    arataMesaj(libere(p) <= MAX_BUCATI
+      ? 'Din prima serie ' + p.nume + ' mai sunt libere doar ' + bucati(libere(p)) + '.'
+      : 'Online poți precomanda cel mult ' + MAX_BUCATI + ' bucăți. Scrie-ne pentru mai multe.');
     return;
   }
   if (item) item.qty += 1;
@@ -326,14 +368,20 @@ function schimbaCantitate(id, schimbare) {
 }
 
 function totalCos() {
-  return cos.reduce((s, item) => s + gasesteProdus(item.id).pret * item.qty, 0);
+  return cos.reduce((s, item) => s + gasesteProdus(item.id).pretPrecomanda * item.qty, 0);
+}
+
+function totalAvans() {
+  return cos.reduce((s, item) => s + avansPereche(gasesteProdus(item.id)) * item.qty, 0);
 }
 
 function afiseazaCos() {
   const numar = cos.reduce((s, item) => s + item.qty, 0);
+  const total = totalCos();
+  const avans = totalAvans();
 
   document.getElementById('bag-count').textContent = numar;
-  document.getElementById('bag-subtotal').textContent = lei(totalCos());
+  document.getElementById('bag-subtotal').textContent = lei(total);
   document.getElementById('bag-empty').hidden = numar > 0;
   document.getElementById('bag-foot').hidden = numar === 0;
   bagMessage.textContent = '';
@@ -353,10 +401,27 @@ function afiseazaCos() {
             <button type="button" data-qty="1" data-id="${p.id}" aria-label="O bucată în plus din ${p.nume}">+</button>
           </div>
         </div>
-        <p class="bag-item-price">${lei(p.pret * item.qty)}</p>
+        <p class="bag-item-price">${lei(p.pretPrecomanda * item.qty)}</p>
       </li>`;
   }).join('');
+
+  // Cele două feluri de a plăti, cu sumele calculate
+  payOptions.innerHTML = `
+    <label class="pay-option">
+      <input type="radio" name="plata" value="avans" ${tipPlata === 'avans' ? 'checked' : ''}>
+      <span><strong>Avans ${lei(avans)} acum</strong>
+        <small>Restul de ${lei(total - avans)} la livrare, cu cardul sau ramburs</small></span>
+    </label>
+    <label class="pay-option">
+      <input type="radio" name="plata" value="integral" ${tipPlata === 'integral' ? 'checked' : ''}>
+      <span><strong>Tot acum, ${lei(total)}</strong>
+        <small>Nu mai plătești nimic la livrare</small></span>
+    </label>`;
 }
+
+payOptions.addEventListener('change', (event) => {
+  tipPlata = event.target.value;
+});
 
 bagItems.addEventListener('click', (event) => {
   const b = event.target.closest('[data-qty]');
@@ -373,195 +438,66 @@ document.querySelectorAll('dialog').forEach((dialog) => {
   });
 });
 
-// Ascundem metodele de plată oprite din setări
-const cardPornit = PLATA.card !== 'oprit';
-const rambursPornit = PLATA.ramburs.activ;
-document.getElementById('pay-card').hidden = !cardPornit;
-document.getElementById('pay-ramburs').hidden = !rambursPornit;
-if (!cardPornit && rambursPornit) document.querySelector('[name="plata"][value="ramburs"]').checked = true;
-// Cu o singură metodă, alegerea nu mai are rost
-document.getElementById('pay-methods').hidden = !(cardPornit && rambursPornit);
-
-// Verificăm coșul chiar înainte de plată (stocul sau data lansării se pot schimba între timp)
+// Verificăm coșul chiar înainte de plată (locurile din serie se pot ocupa între timp)
 function problemaCos() {
   for (const item of cos) {
     const p = gasesteProdus(item.id);
     const disp = disponibilitate(p);
     if (!disp.ok) return p.nume + ': ' + disp.motiv.toLowerCase() + '. Scoate-l din coș ca să continui.';
-    if (item.qty > p.stoc) return 'Mai avem doar ' + bucati(p.stoc) + ' din ' + p.nume + '.';
+    if (item.qty > libere(p)) return 'Din prima serie ' + p.nume + ' mai sunt libere doar ' + bucati(libere(p)) + '.';
   }
   return '';
 }
-
-const checkoutButton = document.getElementById('checkout-button');
-checkoutButton.addEventListener('click', () => {
-  if (cos.length === 0) return;
-  const problema = problemaCos();
-  if (problema) { bagMessage.textContent = problema; return; }
-
-  const metoda = document.querySelector('[name="plata"]:checked').value;
-  if (metoda === 'ramburs') deschideRamburs();
-  else platesteCuCardul();
-});
 
 // Deschide coșul direct când se ajunge pe index.html#cos (de pe pagina „Cum le facem”)
 if (window.location.hash === '#cos') bagDialog.showModal();
 
 
-/* ---------- 7. Plata cu cardul ---------- */
-async function platesteCuCardul() {
+/* ---------- 8. Plata cu cardul prin Stripe ---------- */
+const checkoutButton = document.getElementById('checkout-button');
+
+checkoutButton.addEventListener('click', async () => {
+  if (cos.length === 0) return;
+  const problema = problemaCos();
+  if (problema) { bagMessage.textContent = problema; return; }
+
   if (PLATA.card === 'demo') {
-    bagMessage.textContent = 'Plata cu cardul nu e conectată încă. Vezi README ca să conectezi Stripe sau Shopify.';
+    bagMessage.textContent = 'Plata nu e conectată încă. Vezi README ca să conectezi Stripe.';
     return;
   }
 
-  if (PLATA.card === 'shopify') {
-    // Shopify „cart permalink”: magazin.myshopify.com/cart/VARIANTA:CANTITATE,...
-    const lipsa = cos.find((item) => !gasesteProdus(item.id).shopifyVariantId);
-    if (lipsa) {
-      bagMessage.textContent = 'Lipsește shopifyVariantId pentru ' + gasesteProdus(lipsa.id).nume + ' în products.js.';
-      return;
-    }
-    const parti = cos.map((item) => gasesteProdus(item.id).shopifyVariantId + ':' + item.qty);
-    window.location.href = 'https://' + PLATA.shopifyDomain + '/cart/' + parti.join(',');
-    return;
+  checkoutButton.disabled = true;
+  checkoutButton.textContent = 'Un moment…';
+  try {
+    // Trimitem doar id-uri, cantități și felul plății. Prețul și locurile sunt verificate pe server.
+    const raspuns = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cos, tip: tipPlata, acces: codAcces })
+    });
+    const date = await raspuns.json();
+    if (!raspuns.ok || !date.url) throw new Error(date.error || 'Eroare la plată');
+    window.location.href = date.url; // pagina de plată Stripe
+  } catch (error) {
+    bagMessage.textContent = error.message && error.message !== 'Failed to fetch'
+      ? error.message
+      : 'Plata nu s-a deschis. Încearcă din nou peste un minut.';
+    checkoutButton.disabled = false;
+    checkoutButton.textContent = 'Precomandă';
   }
-
-  if (PLATA.card === 'stripe') {
-    checkoutButton.disabled = true;
-    checkoutButton.textContent = 'Un moment…';
-    try {
-      // Trimitem doar id-uri și cantități. Prețul și stocul sunt verificate pe server.
-      const raspuns = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cos, acces: codAcces })
-      });
-      const date = await raspuns.json();
-      if (!raspuns.ok || !date.url) throw new Error(date.error || 'Eroare la plată');
-      window.location.href = date.url; // pagina de plată Stripe
-    } catch (error) {
-      bagMessage.textContent = error.message && error.message !== 'Failed to fetch'
-        ? error.message
-        : 'Plata nu s-a deschis. Încearcă din nou peste un minut.';
-      checkoutButton.disabled = false;
-      checkoutButton.textContent = 'Finalizează comanda';
-    }
-  }
-}
+});
 
 // După plată, Stripe trimite clientul înapoi la /?plata=reusita
 const rezultatPlata = parametri.get('plata');
 if (rezultatPlata === 'reusita') {
   cos = [];
   salveazaCos();
-  arataMesaj('Mulțumim! Comanda e confirmată, iar chitanța vine pe email.');
+  arataMesaj('Mulțumim! Precomanda e confirmată. Îți scriem pe email înainte de livrare.');
 }
 if (rezultatPlata || parametri.get('acces')) {
   // Curățăm adresa, ca un refresh să nu repete mesajul
   history.replaceState(null, '', window.location.pathname + window.location.hash);
 }
-
-
-/* ---------- 8. Comanda cu plata ramburs ---------- */
-const codDialog = document.getElementById('cod');
-const codForm = document.getElementById('cod-form');
-const codError = document.getElementById('cod-error');
-
-const JUDETE = ['Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila',
-  'București', 'Buzău', 'Caraș-Severin', 'Călărași', 'Cluj', 'Constanța', 'Covasna', 'Dâmbovița', 'Dolj',
-  'Galați', 'Giurgiu', 'Gorj', 'Harghita', 'Hunedoara', 'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți',
-  'Mureș', 'Neamț', 'Olt', 'Prahova', 'Satu Mare', 'Sălaj', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea',
-  'Vaslui', 'Vâlcea', 'Vrancea'];
-document.getElementById('cod-judet').insertAdjacentHTML('beforeend',
-  JUDETE.map((j) => `<option>${j}</option>`).join(''));
-
-// Comanda, ca text simplu (ajunge așa în emailul tău)
-function rezumatComanda() {
-  return cos.map((item) => {
-    const p = gasesteProdus(item.id);
-    return item.qty + ' × ' + p.nume + ' (' + p.culoare + ') — ' + lei(p.pret * item.qty);
-  }).join('\n');
-}
-
-function deschideRamburs() {
-  bagDialog.close();
-  document.getElementById('cod-summary').textContent =
-    'Total de plată la curier: ' + lei(totalCos()) + '. Livrarea e gratuită.';
-  codForm.hidden = false;
-  document.getElementById('cod-success').hidden = true;
-  codDialog.showModal();
-}
-
-// Telefon românesc: 07xx xxx xxx, 02xx/03xx, cu sau fără +40
-function telefonValid(t) {
-  return /^(\+40|0040|0)[237]\d{8}$/.test(t.replace(/[\s.\-()]/g, ''));
-}
-
-codForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const f = codForm.elements;
-
-  // Verificăm câmpurile în ordine și ne oprim la prima problemă
-  const greseli = [
-    [!f.nume.value.trim(), f.nume, 'Scrie numele complet.'],
-    [!telefonValid(f.telefon.value), f.telefon, 'Verifică numărul de telefon. Curierul te sună pe el.'],
-    [!isValidEmail(f.email.value), f.email, 'Verifică adresa de email.'],
-    [!f.judet.value, f.judet, 'Alege județul.'],
-    [!f.localitate.value.trim(), f.localitate, 'Scrie localitatea.'],
-    [!f.adresa.value.trim(), f.adresa, 'Scrie adresa de livrare.'],
-    [!f.termeni.checked, f.termeni, 'Bifează că accepți termenii și condițiile.']
-  ];
-  codForm.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
-  const greseala = greseli.find(([areProblema]) => areProblema);
-  if (greseala) {
-    codError.textContent = greseala[2];
-    greseala[1].setAttribute('aria-invalid', 'true');
-    greseala[1].focus();
-    return;
-  }
-  codError.textContent = '';
-
-  const date = new FormData(codForm);
-  date.append('comanda', rezumatComanda());
-  date.append('total', lei(totalCos()));
-  date.append('plata', 'Ramburs');
-  if (codAcces) date.append('cod_acces_anticipat', codAcces);
-
-  const submit = document.getElementById('cod-submit');
-  if (PLATA.ramburs.formspreeUrl) {
-    submit.disabled = true;
-    submit.textContent = 'Se trimite…';
-    try {
-      const raspuns = await fetch(PLATA.ramburs.formspreeUrl, {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: date
-      });
-      if (!raspuns.ok) throw new Error('Eroare');
-    } catch (error) {
-      codError.textContent = 'Comanda nu s-a trimis. Încearcă din nou sau scrie-ne la salut@example.com.';
-      submit.disabled = false;
-      submit.textContent = 'Trimite comanda';
-      return;
-    }
-    submit.disabled = false;
-    submit.textContent = 'Trimite comanda';
-  } else {
-    // Mod demo: nu se trimite nimic, și îi spunem asta clar
-    document.getElementById('cod-success-text').textContent =
-      'Mod demo: comanda nu a fost trimisă nicăieri. Vezi README ca să conectezi Formspree.';
-  }
-
-  cos = [];
-  salveazaCos();
-  afiseazaCos();
-  codForm.reset();
-  codForm.hidden = true;
-  const succes = document.getElementById('cod-success');
-  succes.hidden = false;
-  succes.focus();
-});
 
 
 /* ---------- 9. Formularul de abonare ---------- */
@@ -646,7 +582,7 @@ form.addEventListener('submit', async (event) => {
 });
 
 
-/* ---------- 10. Animații la scroll și anul din subsol ---------- */
+/* ---------- 10. Animații la scroll, data livrării, anul ---------- */
 const fadeEls = document.querySelectorAll('.fade-in');
 if ('IntersectionObserver' in window) {
   const observer = new IntersectionObserver((entries) => {
@@ -662,9 +598,14 @@ if ('IntersectionObserver' in window) {
   fadeEls.forEach((el) => el.classList.add('is-visible'));
 }
 
+// Data livrării și avansul apar în mai multe locuri; le luăm din products.js
+document.querySelectorAll('[data-livrare]').forEach((el) => { el.textContent = PRECOMANDA.livrare; });
+document.querySelectorAll('[data-avans]').forEach((el) => { el.textContent = numarRo.format(PRECOMANDA.avans); });
+
 document.getElementById('year').textContent = new Date().getFullYear();
 
 
 /* ---------- Pornire ---------- */
 afiseazaProduse();
 afiseazaCos();
+incarcaRezervari();

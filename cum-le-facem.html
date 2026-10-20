@@ -157,9 +157,9 @@
 
     <section class="section about page-cta">
       <div class="container fade-in">
-        <h2 class="section-title">Acum le poți încerca</h2>
-        <p class="section-intro">Livrare gratuită în toată România, în 24–48 h. Dacă nu îți plac, ai 30 de zile să le returnezi.</p>
-        <a href="index.html#magazin" class="btn btn-primary">Vezi colecția</a>
+        <h2 class="section-title">Prima serie se face acum</h2>
+        <p class="section-intro">Precomanzi la preț mai mic, cu un avans de <span data-avans>300</span> lei, și îi primești în <span data-livrare>martie 2027</span>. Dacă nu îți plac, ai 30 de zile să-i returnezi.</p>
+        <a href="index.html#magazin" class="btn btn-primary">Precomandă din prima serie</a>
       </div>
     </section>
 
@@ -187,7 +187,12 @@
     </div>
   </footer>
 
+  <!-- Setările de precomandă (data livrării, avansul) vin din products.js -->
+  <script src="products.js"></script>
   <script>
+    document.querySelectorAll('[data-livrare]').forEach((el) => { el.textContent = PRECOMANDA.livrare; });
+    document.querySelectorAll('[data-avans]').forEach((el) => { el.textContent = new Intl.NumberFormat('ro-RO').format(PRECOMANDA.avans); });
+
     // Numărul de produse din coș (coșul e salvat în browser de pagina principală)
     try {
       const cos = JSON.parse(localStorage.getItem('elen-cos')) || [];

@@ -557,7 +557,7 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
   html { scroll-behavior: auto; }
   .js .fade-in { opacity: 1; transform: none; transition: none; }
   .product-media img, .toast { transition: none; }
-  .quickview[open], .bag[open], .cod[open] { animation: none; }
+  .quickview[open], .bag[open] { animation: none; }
 }
 
 /* =========================================================
@@ -679,23 +679,8 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
 .pay-option:has(input:checked) { border-color: var(--color-text); }
 .pay-option input { margin-top: 0.3rem; accent-color: var(--color-accent); }
 .pay-option small { display: block; color: var(--color-muted); font-size: 0.8rem; }
-.pay-option[hidden], .pay-methods[hidden] { display: none; }
 
-.cod {
-  width: min(100% - 2rem, 560px);
-  max-height: calc(100% - 2rem);
-  padding: 0;
-  border: 0;
-  background: var(--color-bg);
-}
-.cod[open] { animation: fade-in 0.25s ease; }
-.cod .dialog-close { position: absolute; top: 0.5rem; right: 0.5rem; }
-.cod-inner { padding: 2rem 1.5rem; }
-.cod-inner h2 { font-size: 2rem; margin-bottom: 0.5rem; }
-.cod-summary { color: var(--color-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
-.cod .field { margin-bottom: 1rem; }
-.cod .field-error { margin-bottom: 1rem; }
-.field-row { display: grid; gap: 0 1rem; }
+
 
 /* ---------- 17. Pagina „Cum le facem” ---------- */
 .page-hero { min-height: min(70vh, 620px); }
@@ -717,13 +702,67 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
 .page-cta { text-align: center; }
 .page-cta .section-intro { margin: 0 auto 2rem; }
 
-@media (min-width: 600px) {
-  .field-row { grid-template-columns: 1fr 1fr; }
-}
 
 @media (min-width: 900px) {
   .size-guide-inner { grid-template-columns: 1.1fr 0.9fr; gap: 5rem; align-items: center; }
   .step { grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .step:nth-child(even) .step-media { order: 2; }
-  .cod-inner { padding: 2.5rem; }
+}
+
+/* ---------- 18. Precomandă: prețuri, serie, pași, întrebări ---------- */
+.product-prices { text-align: right; }
+
+/* Pe telefon, prețurile stau sub nume, nu lângă */
+@media (max-width: 599px) {
+  .product-info { display: block; }
+  .product-prices { text-align: left; margin-top: 0.4rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.5rem; }
+}
+.product-later, .qv-later { font-size: 0.75rem; color: var(--color-muted); margin: 0; font-weight: 400; }
+.qv-later { display: block; margin-top: 0.15rem; }
+
+.serie-bar {
+  display: block;
+  height: 3px;
+  background: var(--color-line);
+  margin: 0.6rem 0 0.35rem;
+  overflow: hidden;
+}
+.serie-bar span { display: block; height: 100%; background: var(--color-accent); }
+.quickview .serie-bar { margin-top: 0; }
+
+.preorder { background: var(--color-beige); }
+.preorder-steps {
+  list-style: none;
+  margin: 0 0 3rem;
+  padding: 0;
+  display: grid;
+  gap: 2rem;
+  counter-reset: pasp;
+}
+.preorder-steps li { border-top: 1px solid var(--color-text); padding-top: 1.25rem; }
+.preorder-steps h3 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.preorder-steps h3::before {
+  counter-increment: pasp;
+  content: counter(pasp) ". ";
+  color: var(--color-accent);
+}
+.preorder-steps p { color: var(--color-muted); margin: 0; }
+
+.faq { max-width: 46rem; }
+.faq details { border-bottom: 1px solid var(--color-line); padding: 1rem 0; }
+.faq summary {
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-size: 1.25rem; line-height: 1; }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { margin: 0.75rem 0 0; color: var(--color-muted); max-width: 40rem; }
+
+@media (min-width: 900px) {
+  .preorder-steps { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
 }

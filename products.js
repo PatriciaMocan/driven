@@ -14,18 +14,22 @@
      detalii     listă cu specificații
      poze        pozele tale, prima e cea principală (vezi README pentru nume și mărimi)
      alt         descrierea pozei pentru cititoare de ecran și Google
-     stoc        câte bucăți ai fizic. 0 = epuizat. Actualizează-l după fiecare vânzare!
+     pretPrecomanda  prețul plătit de cine precomandă acum (mai mic decât pret)
+     serie       câte bucăți are prima serie. Când se rezervă toate, precomanda se închide.
+     rezervateManual  rezervări făcute în afara site-ului (telefon, Instagram).
+                 Rezervările plătite pe site cu cardul se numără singure din Stripe.
+                 Poate fi negativ, ca să scazi o precomandă anulată și rambursată.
      dimensiuni  în milimetri, măsurate pe rama reală:
                    lentila  = lățimea unei lentile
                    punte    = distanța dintre lentile
                    brat     = lungimea brațului
                    inaltime = înălțimea lentilei
                    totala   = lățimea totală a ramei, din față
-     accesAbonati  (opțional) de când pot cumpăra abonații cu link de acces anticipat
-     lansare       (opțional) de când poate cumpăra oricine
+     accesAbonati  (opțional) de când pot precomanda abonații cu link de acces anticipat
+     lansare       (opțional) de când poate precomanda oricine
      shopifyVariantId  doar dacă folosești Shopify (vezi README)
 
-   [DE VERIFICAT] Prețurile, stocurile, dimensiunile și specificațiile de mai jos
+   [DE VERIFICAT] Prețurile, seriile, dimensiunile și specificațiile de mai jos
    sunt exemple. Înlocuiește-le cu datele reale înainte să primești comenzi.
    ========================================================= */
 
@@ -41,7 +45,9 @@ const PRODUCTS = [
     detalii: ['Acetat italian, lustruit manual', 'Lentile polarizate, categoria 3, protecție UV400', 'Balamale cu cinci inele', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/sola-1.jpg', 'images/produse/sola-2.jpg', 'images/produse/sola-3.jpg'],
     alt: 'Ochelari de soare Sola, ramă havana închis',
-    stoc: 7,
+    pretPrecomanda: 1520,
+    serie: 100,
+    rezervateManual: 0,
     dimensiuni: { lentila: 53, punte: 19, brat: 145, inaltime: 46, totala: 142 },
     shopifyVariantId: ''
   },
@@ -56,7 +62,9 @@ const PRODUCTS = [
     detalii: ['Titan placat cu aur', 'Lentile polarizate, categoria 3, protecție UV400', 'Plăcuțe nazale reglabile', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/lido-1.jpg', 'images/produse/lido-2.jpg', 'images/produse/lido-3.jpg'],
     alt: 'Ochelari de soare Lido, ramă rotundă aurie',
-    stoc: 3,
+    pretPrecomanda: 1320,
+    serie: 60,
+    rezervateManual: 0,
     dimensiuni: { lentila: 49, punte: 21, brat: 145, inaltime: 47, totala: 135 },
     shopifyVariantId: ''
   },
@@ -71,7 +79,9 @@ const PRODUCTS = [
     detalii: ['Acetat italian', 'Lentile polarizate gri, categoria 3, protecție UV400', 'Balamale cu arc', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/marea-1.jpg', 'images/produse/marea-2.jpg', 'images/produse/marea-3.jpg'],
     alt: 'Ochelari de soare Marea, ramă neagră',
-    stoc: 12,
+    pretPrecomanda: 1440,
+    serie: 150,
+    rezervateManual: 0,
     dimensiuni: { lentila: 55, punte: 18, brat: 150, inaltime: 48, totala: 148 },
     shopifyVariantId: ''
   },
@@ -86,7 +96,9 @@ const PRODUCTS = [
     detalii: ['Acetat și oțel inoxidabil', 'Lentile polarizate, categoria 3, protecție UV400', 'Plăcuțe nazale reglabile', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/corso-1.jpg', 'images/produse/corso-2.jpg', 'images/produse/corso-3.jpg'],
     alt: 'Ochelari de soare Corso, model browline negru cu argintiu',
-    stoc: 5,
+    pretPrecomanda: 1610,
+    serie: 80,
+    rezervateManual: 0,
     dimensiuni: { lentila: 51, punte: 21, brat: 145, inaltime: 42, totala: 140 },
     shopifyVariantId: ''
   },
@@ -101,7 +113,9 @@ const PRODUCTS = [
     detalii: ['Acetat italian', 'Lentile polarizate maro, categoria 3, protecție UV400', 'Balamale cu cinci inele', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/vela-1.jpg', 'images/produse/vela-2.jpg', 'images/produse/vela-3.jpg'],
     alt: 'Ochelari de soare Vela, ramă havana deschis',
-    stoc: 0,
+    pretPrecomanda: 1350,
+    serie: 80,
+    rezervateManual: 0,
     dimensiuni: { lentila: 52, punte: 20, brat: 145, inaltime: 45, totala: 140 },
     shopifyVariantId: ''
   },
@@ -116,7 +130,9 @@ const PRODUCTS = [
     detalii: ['Acetat și oțel placat cu aur', 'Lentile polarizate, categoria 3, protecție UV400', 'Plăcuțe nazale reglabile', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/riva-1.jpg', 'images/produse/riva-2.jpg', 'images/produse/riva-3.jpg'],
     alt: 'Ochelari de soare Riva, model browline havana cu auriu',
-    stoc: 2,
+    pretPrecomanda: 1660,
+    serie: 50,
+    rezervateManual: 0,
     dimensiuni: { lentila: 53, punte: 20, brat: 145, inaltime: 43, totala: 143 },
     shopifyVariantId: ''
   },
@@ -131,7 +147,9 @@ const PRODUCTS = [
     detalii: ['Acetat italian', 'Lentile polarizate, categoria 3, protecție UV400', 'Balamale cu cinci inele', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/ines-1.jpg', 'images/produse/ines-2.jpg', 'images/produse/ines-3.jpg'],
     alt: 'Ochelari de soare Ines, ramă ivoire',
-    stoc: 9,
+    pretPrecomanda: 1230,
+    serie: 80,
+    rezervateManual: 0,
     dimensiuni: { lentila: 54, punte: 18, brat: 145, inaltime: 50, totala: 146 },
     shopifyVariantId: ''
   },
@@ -146,12 +164,14 @@ const PRODUCTS = [
     detalii: ['Acetat italian translucid', 'Lentile polarizate gri, categoria 3, protecție UV400', 'Balamale cu arc', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/alba-1.jpg', 'images/produse/alba-2.jpg', 'images/produse/alba-3.jpg'],
     alt: 'Ochelari de soare Alba, ramă fumurie translucidă',
-    stoc: 6,
+    pretPrecomanda: 1400,
+    serie: 60,
+    rezervateManual: 0,
     dimensiuni: { lentila: 50, punte: 20, brat: 140, inaltime: 42, totala: 134 },
     shopifyVariantId: ''
   },
   {
-    // Exemplu de lansare: abonații cu link pot cumpăra de la accesAbonati,
+    // Exemplu de acces anticipat: abonații cu link pot precomanda de la accesAbonati,
     // toată lumea de la lansare. Șterge cele două date ca să fie disponibil pentru toți.
     id: 'nora',
     nume: 'Nora',
@@ -163,13 +183,29 @@ const PRODUCTS = [
     detalii: ['Acetat italian translucid', 'Lentile polarizate verzi, categoria 3, protecție UV400', 'Balamale cu cinci inele', 'Husă din piele și lavetă incluse'],
     poze: ['images/produse/nora-1.jpg', 'images/produse/nora-2.jpg', 'images/produse/nora-3.jpg'],
     alt: 'Ochelari de soare Nora, ramă pătrată verde translucid',
-    stoc: 20,
+    pretPrecomanda: 1570,
+    serie: 100,
+    rezervateManual: 0,
     dimensiuni: { lentila: 56, punte: 17, brat: 145, inaltime: 52, totala: 150 },
     accesAbonati: '2026-10-15T10:00:00+03:00',
     lansare: '2026-11-20T10:00:00+02:00',
     shopifyVariantId: ''
   }
 ];
+
+/* =========================================================
+   SETĂRI PRECOMANDĂ
+   Folosite și de pagină, și de plata cu cardul (api/checkout.js).
+   ========================================================= */
+const PRECOMANDA = {
+  livrare: 'martie 2027', // [EDIT ME] când primesc clienții ochelarii. Trebuie să fie o dată pe care o poți ține.
+  avans: 300              // lei per pereche, dacă clientul alege să plătească doar avansul
+};
+
+// Câte bucăți mai sunt libere în prima serie, știind câte s-au rezervat
+function locuriLibere(produs, rezervate) {
+  return Math.max(0, produs.serie - rezervate);
+}
 
 /* Mărimea (mică / medie / mare) se calculează din lățimea totală a ramei.
    Schimbă limitele aici dacă vrei. */
@@ -182,8 +218,8 @@ function marimeRama(produs) {
 
 /* Unde e produsul în calendarul de lansare, la momentul `acum`:
      'curand'    nimeni nu poate cumpăra încă
-     'abonati'   pot cumpăra doar abonații cu cod de acces anticipat
-     'disponibil' oricine poate cumpăra */
+     'abonati'   pot precomanda doar abonații cu cod de acces anticipat
+     'disponibil' oricine poate precomanda */
 function etapaLansare(produs, acum) {
   const t = (acum || new Date()).getTime();
   if (produs.lansare && t < new Date(produs.lansare).getTime()) {
@@ -194,5 +230,5 @@ function etapaLansare(produs, acum) {
 }
 
 /* Permite funcției de plată cu cardul (api/checkout.js) să citească aceeași listă,
-   ca prețurile și stocul să nu poată fi modificate din browser. Nu modifica linia asta. */
-if (typeof module !== 'undefined') module.exports = { PRODUCTS, marimeRama, etapaLansare };
+   ca prețurile și locurile din serie să nu poată fi modificate din browser. Nu modifica linia asta. */
+if (typeof module !== 'undefined') module.exports = { PRODUCTS, PRECOMANDA, locuriLibere, marimeRama, etapaLansare };

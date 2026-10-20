@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- ===== Titlul și descrierea paginii (apar în Google) ===== -->
-  <title>Elen Sunglasses — Ochelari de soare de lux, făcuți în serii mici</title>
-  <meta name="description" content="Ochelari de soare din acetat italian și titan, cu lentile polarizate. Livrare gratuită în toată România în 24–48 h, plată cu cardul sau ramburs.">
+  <title>Elen Sunglasses — Precomandă prima serie</title>
+  <meta name="description" content="Precomandă ochelari de soare Elen din prima serie, la preț de precomandă. Acetat italian și titan, lentile polarizate. Avans de 300 lei, restul la livrare.">
   <meta name="theme-color" content="#F7F4EE">
 
   <!-- ===== Open Graph (previzualizarea când trimiți linkul) =====
        Înlocuiește https://elensunglasses.ro cu domeniul tău real. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Elen Sunglasses">
-  <meta property="og:title" content="Elen Sunglasses — Ochelari de soare de lux">
-  <meta property="og:description" content="Acetat italian, titan, lentile polarizate. Livrare gratuită în toată România.">
+  <meta property="og:title" content="Elen Sunglasses — Precomandă prima serie">
+  <meta property="og:description" content="Prima serie, la preț de precomandă. Acetat italian, titan, lentile polarizate.">
   <meta property="og:url" content="https://elensunglasses.ro/">
   <meta property="og:image" content="https://elensunglasses.ro/images/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -61,29 +61,30 @@
       <img class="hero-bg" src="images/hero.jpg" alt="" width="2000" height="1333" fetchpriority="high"
            onerror="this.onerror=null;this.src='images/hero.svg'">
       <div class="container hero-inner">
-        <p class="eyebrow">Colecția de vară · Nouă rame</p>
+        <p class="eyebrow">Prima serie · Precomenzile sunt deschise</p>
         <h1 class="hero-title">Elen</h1>
         <p class="hero-lead">
           Ochelari de soare din acetat italian și titan, făcuți în serii mici. Fără logo pe brațe.
+          Precomanzi acum la preț mai mic și îi primești în <span data-livrare>martie 2027</span>.
         </p>
-        <a href="#magazin" class="btn btn-light">Vezi colecția</a>
+        <a href="#magazin" class="btn btn-light">Precomandă din prima serie</a>
       </div>
     </section>
 
     <!-- ================= 2. PROMISIUNI =================
-         [EDIT ME] Verifică să corespundă cu politica ta reală de livrare și retur. -->
-    <section class="promises" aria-label="Livrare și plată">
+         [EDIT ME] Verifică să corespundă cu ce poți promite. Data vine din products.js (PRECOMANDA.livrare). -->
+    <section class="promises" aria-label="Cum funcționează precomanda">
       <ul class="container promises-list">
-        <li>Livrare gratuită în toată România, în 24–48 h</li>
-        <li>Plată cu cardul sau ramburs</li>
-        <li>Retur gratuit în 30 de zile</li>
-        <li>Garanție 2 ani</li>
+        <li>Livrare în <span data-livrare>martie 2027</span></li>
+        <li>Avans de <span data-avans>300</span> lei, restul la livrare</li>
+        <li>Banii înapoi dacă nu livrăm la timp</li>
+        <li>Livrare gratuită în toată România</li>
       </ul>
     </section>
 
     <!-- Apare doar pentru abonații care au intrat pe site cu linkul de acces anticipat -->
     <div class="early-banner" id="early-banner" hidden>
-      <p class="container">Ai acces anticipat. Poți cumpăra modelele noi înainte de lansarea publică.</p>
+      <p class="container">Ai acces anticipat. Poți precomanda modelele noi înainte de lansarea publică.</p>
     </div>
 
     <!-- ================= 3. MAGAZIN =================
@@ -93,8 +94,8 @@
       <div class="container">
         <div class="shop-head fade-in">
           <div>
-            <p class="eyebrow">Colecția</p>
-            <h2 class="section-title">Ochelari de soare</h2>
+            <p class="eyebrow">Prima serie</p>
+            <h2 class="section-title">Precomandă</h2>
           </div>
 
           <div class="shop-controls">
@@ -134,7 +135,56 @@
 
         <noscript><p>Activează JavaScript ca să vezi colecția.</p></noscript>
 
-        <p class="vat-note">Prețuri în lei, cu TVA inclus. <a href="#ghid-marimi">Nu știi ce mărime porți?</a></p>
+        <p class="vat-note">Prețuri în lei, cu TVA inclus. Prețul de precomandă e valabil doar pentru prima serie. <a href="#ghid-marimi">Nu știi ce mărime porți?</a></p>
+      </div>
+    </section>
+
+    <!-- ================= CUM FUNCȚIONEAZĂ PRECOMANDA =================
+         [EDIT ME] Răspunsurile de mai jos sunt promisiuni față de client.
+         Păstrează doar ce poți respecta și copiază-le și în Termeni și condiții. -->
+    <section class="preorder section" id="precomanda">
+      <div class="container">
+        <div class="fade-in">
+          <p class="eyebrow">Precomanda</p>
+          <h2 class="section-title">Cum funcționează</h2>
+        </div>
+        <ol class="preorder-steps fade-in">
+          <li>
+            <h3>Alegi rama și plătești</h3>
+            <p>Tot prețul de precomandă acum sau doar un avans de <span data-avans>300</span> lei pe pereche. Plata e cu cardul, prin Stripe.</p>
+          </li>
+          <li>
+            <h3>Facem prima serie</h3>
+            <p>Comandăm producția exact pe câte precomenzi avem. Îți scriem pe email cum avansează lucrurile.</p>
+          </li>
+          <li>
+            <h3>Îi primești în <span data-livrare>martie 2027</span></h3>
+            <p>Livrare gratuită prin curier. Dacă ai dat avans, restul îl plătești la livrare, cu cardul sau ramburs.</p>
+          </li>
+        </ol>
+
+        <div class="faq fade-in">
+          <details>
+            <summary>Ce se întâmplă dacă livrarea întârzie?</summary>
+            <p>Te anunțăm din timp. Dacă nu livrăm până la sfârșitul lunii promise, poți cere banii înapoi integral, fără nicio explicație.</p>
+          </details>
+          <details>
+            <summary>Pot anula precomanda?</summary>
+            <p>Da, oricând până pleacă coletul. Îți returnăm tot ce ai plătit, inclusiv avansul, în cel mult 14 zile.</p>
+          </details>
+          <details>
+            <summary>Și dacă nu-mi plac când îi primesc?</summary>
+            <p>Ai 30 de zile să-i returnezi, ca la orice comandă online. Returul e gratuit.</p>
+          </details>
+          <details>
+            <summary>De ce e prețul mai mic acum?</summary>
+            <p>Pentru că precomenzile ne ajută să plătim producția înainte. Prețul de precomandă e doar pentru prima serie; după livrare, rama costă prețul întreg.</p>
+          </details>
+          <details>
+            <summary>Ce se întâmplă când se rezervă toată seria?</summary>
+            <p>Precomanda pentru modelul acela se închide. Abonații află primii când pornește seria următoare.</p>
+          </details>
+        </div>
       </div>
     </section>
 
@@ -213,10 +263,10 @@
     <section class="notify section" id="abonare">
       <div class="container notify-inner fade-in">
         <p class="eyebrow">Lista Elen</p>
-        <h2 class="section-title">Cumperi modelele noi înaintea tuturor</h2>
+        <h2 class="section-title">Precomanzi modelele noi înaintea tuturor</h2>
         <p class="section-intro">
-          Scriem când apare o ramă sau o culoare nouă, de câteva ori pe an. Abonații primesc un link
-          de acces anticipat și pot cumpăra înainte de lansarea publică, cât timp seriile mici încă nu s-au terminat.
+          Nu ești gata să precomanzi acum? Lasă-ne emailul. Îți scriem când pornește o serie nouă, iar abonații
+          primesc un link de acces anticipat, înainte să se rezerve locurile.
         </p>
 
         <form class="notify-form" id="notify-form" novalidate>
@@ -314,7 +364,7 @@
 
         <h3 class="qv-subtitle">Detalii</h3>
         <ul class="qv-details" id="qv-details"></ul>
-        <button type="button" class="btn btn-primary" id="qv-add">Adaugă în coș</button>
+        <button type="button" class="btn btn-primary" id="qv-add">Precomandă</button>
       </div>
     </div>
   </dialog>
@@ -331,82 +381,16 @@
 
     <div class="bag-foot" id="bag-foot">
       <p class="bag-total"><span>Subtotal</span> <span id="bag-subtotal">0 lei</span></p>
-      <p class="bag-small">TVA inclus. Livrare gratuită în toată România, în 24–48 h.</p>
+      <p class="bag-small">TVA inclus. Precomandă: livrare gratuită în <span data-livrare>martie 2027</span>.</p>
 
-      <!-- Metodele de plată. Le pornești și oprești din script.js (secțiunea SETĂRI PLATĂ). -->
+      <!-- Opțiunile de plată sunt completate de script.js (secțiunea SETĂRI PLATĂ) -->
       <fieldset class="pay-methods" id="pay-methods">
         <legend>Cum plătești?</legend>
-        <label class="pay-option" id="pay-card">
-          <input type="radio" name="plata" value="card" checked>
-          <span><strong>Card</strong> <small>Visa, Mastercard, Apple Pay, Google Pay</small></span>
-        </label>
-        <label class="pay-option" id="pay-ramburs">
-          <input type="radio" name="plata" value="ramburs">
-          <span><strong>Ramburs</strong> <small>Plătești curierului, la livrare</small></span>
-        </label>
+        <div id="pay-options"></div>
       </fieldset>
 
-      <button type="button" class="btn btn-primary btn-block" id="checkout-button">Finalizează comanda</button>
+      <button type="button" class="btn btn-primary btn-block" id="checkout-button">Precomandă</button>
       <p class="bag-message" id="bag-message" aria-live="polite"></p>
-    </div>
-  </dialog>
-
-  <!-- ================= COMANDĂ CU PLATA RAMBURS ================= -->
-  <dialog class="cod" id="cod" aria-labelledby="cod-title">
-    <button class="dialog-close" type="button" aria-label="Închide">&times;</button>
-    <div class="cod-inner">
-      <h2 id="cod-title">Date de livrare</h2>
-      <p class="cod-summary" id="cod-summary"></p>
-
-      <form id="cod-form" novalidate>
-        <div class="field">
-          <label for="cod-nume">Nume și prenume</label>
-          <input type="text" id="cod-nume" name="nume" autocomplete="name" required>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="cod-telefon">Telefon</label>
-            <input type="tel" id="cod-telefon" name="telefon" autocomplete="tel" inputmode="tel" placeholder="07xx xxx xxx" required>
-          </div>
-          <div class="field">
-            <label for="cod-email">Email</label>
-            <input type="email" id="cod-email" name="email" autocomplete="email" required>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="cod-judet">Județ</label>
-            <select id="cod-judet" name="judet" autocomplete="address-level1" required>
-              <option value="">Alege județul</option>
-              <!-- Lista e completată de script.js -->
-            </select>
-          </div>
-          <div class="field">
-            <label for="cod-localitate">Localitate</label>
-            <input type="text" id="cod-localitate" name="localitate" autocomplete="address-level2" required>
-          </div>
-        </div>
-        <div class="field">
-          <label for="cod-adresa">Adresă</label>
-          <input type="text" id="cod-adresa" name="adresa" autocomplete="street-address" placeholder="Strada, număr, bloc, apartament" required>
-        </div>
-        <div class="field">
-          <label for="cod-postal">Cod poștal <span class="optional">(opțional)</span></label>
-          <input type="text" id="cod-postal" name="cod_postal" autocomplete="postal-code" inputmode="numeric">
-        </div>
-        <div class="field field-checkbox">
-          <input type="checkbox" id="cod-termeni" name="termeni" required>
-          <label for="cod-termeni">Am citit și accept <a href="#">termenii și condițiile</a>.</label>
-        </div>
-        <p class="field-error" id="cod-error" aria-live="polite"></p>
-        <button type="submit" class="btn btn-primary btn-block" id="cod-submit">Trimite comanda</button>
-        <p class="bag-small">Te sunăm să confirmăm comanda înainte s-o predăm curierului.</p>
-      </form>
-
-      <div class="form-success" id="cod-success" hidden tabindex="-1">
-        <h3>Am primit comanda.</h3>
-        <p id="cod-success-text">Te sunăm în cel mult o zi lucrătoare să o confirmăm.</p>
-      </div>
     </div>
   </dialog>
 

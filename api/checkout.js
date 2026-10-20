@@ -1,10 +1,11 @@
 /* =========================================================
-   Plata cu cardul prin Stripe (o funcție serverless Vercel)
+   Precomandă cu plata prin card, prin Stripe (o funcție serverless Vercel)
    Folosită doar când PLATA.card este 'stripe' în script.js.
 
-   Browserul trimite { items: [{ id, qty }], acces: 'COD' }. Funcția:
-     - ia prețurile și stocul din products.js (nu din browser)
-     - verifică dacă modelele nelansate sunt cumpărate cu un cod de acces valid
+   Browserul trimite { items: [{ id, qty }], tip: 'integral' | 'avans', acces: 'COD' }. Funcția:
+     - ia prețurile din products.js (nu din browser)
+     - verifică dacă mai sunt locuri în prima serie (din plățile reale din Stripe)
+     - verifică codul de acces anticipat pentru modelele încă nelansate
      - cere de la Stripe o pagină de plată în lei și trimite înapoi adresa ei
    Cheia secretă nu ajunge niciodată în browser.
 
@@ -14,7 +15,8 @@
    Nu e nevoie de npm install: funcția vorbește direct cu API-ul Stripe.
    ========================================================= */
 
-const { PRODUCTS, etapaLansare } = require('../products.js');
+const { PRODUCTS, PRECOMANDA, locuriLibere, etapaLansare } = require('../products.js');
+const { stripe, numaraRezervari } = require('./_stripe.js');
 
 const MAX_BUCATI = 10; // aceeași limită ca în script.js
 
@@ -35,67 +37,80 @@ module.exports = async (req, res) => {
 
   const body = req.body || {};
   const items = Array.isArray(body.items) ? body.items : [];
+  const avans = body.tip === 'avans';
   const codCorect = process.env.ACCES_ANTICIPAT_COD;
   const areAcces = Boolean(codCorect) && body.acces === codCorect;
 
-  // Stripe vrea câmpuri de forma line_items[0][quantity]=1
-  const form = new URLSearchParams();
-  let linie = 0;
-  for (const item of items) {
-    const produs = PRODUCTS.find((p) => p.id === item.id);
-    const qty = Math.floor(Number(item.qty));
-    if (!produs || !(qty >= 1 && qty <= MAX_BUCATI)) continue; // ignorăm ce nu e în regulă
-
-    const etapa = etapaLansare(produs);
-    if (etapa === 'curand' || (etapa === 'abonati' && !areAcces)) {
-      return res.status(403).json({ error: `${produs.nume} nu e încă disponibil. Ai nevoie de linkul de acces anticipat.` });
-    }
-    if (produs.stoc <= 0) {
-      return res.status(409).json({ error: `${produs.nume} s-a epuizat.` });
-    }
-    if (qty > produs.stoc) {
-      return res.status(409).json({ error: `Mai avem doar ${bucati(produs.stoc)} din ${produs.nume}.` });
-    }
-
-    form.append(`line_items[${linie}][quantity]`, String(qty));
-    form.append(`line_items[${linie}][price_data][currency]`, 'ron');
-    form.append(`line_items[${linie}][price_data][unit_amount]`, String(produs.pret * 100)); // în bani
-    form.append(`line_items[${linie}][price_data][product_data][name]`, `${produs.nume} — ${produs.culoare}`);
-    linie += 1;
-  }
-
-  if (linie === 0) {
-    return res.status(400).json({ error: 'Coșul e gol.' });
-  }
-
-  // Unde trimite Stripe clientul după plată sau renunțare
-  const origin = `https://${req.headers.host}`;
-  form.append('mode', 'payment');
-  form.append('locale', 'ro');
-  form.append('success_url', `${origin}/?plata=reusita`);
-  form.append('cancel_url', `${origin}/?plata=anulata`);
-  form.append('shipping_address_collection[allowed_countries][0]', 'RO'); // livrăm doar în România
-  form.append('phone_number_collection[enabled]', 'true');                // curierul are nevoie de telefon
-  if (areAcces) form.append('metadata[acces_anticipat]', 'da');
-
   try {
-    const raspuns = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: form
-    });
-    const sesiune = await raspuns.json();
+    const rezervate = await numaraRezervari();
 
-    if (!raspuns.ok) {
-      console.error('Eroare Stripe:', sesiune.error && sesiune.error.message);
-      return res.status(502).json({ error: 'Plata nu s-a putut deschide. Încearcă din nou.' });
+    // Stripe vrea câmpuri de forma line_items[0][quantity]=1
+    const form = new URLSearchParams();
+    const produseComandate = [];
+    let restDePlata = 0;
+    let linie = 0;
+
+    for (const item of items) {
+      const produs = PRODUCTS.find((p) => p.id === item.id);
+      const qty = Math.floor(Number(item.qty));
+      if (!produs || !(qty >= 1 && qty <= MAX_BUCATI)) continue; // ignorăm ce nu e în regulă
+
+      const etapa = etapaLansare(produs);
+      if (etapa === 'curand' || (etapa === 'abonati' && !areAcces)) {
+        return res.status(403).json({ error: `${produs.nume} nu se poate precomanda încă. Ai nevoie de linkul de acces anticipat.` });
+      }
+      const libere = locuriLibere(produs, rezervate[produs.id]);
+      if (libere <= 0) {
+        return res.status(409).json({ error: `Prima serie ${produs.nume} s-a rezervat complet.` });
+      }
+      if (qty > libere) {
+        return res.status(409).json({ error: libere === 1
+          ? `Din prima serie ${produs.nume} mai e liberă o singură bucată.`
+          : `Din prima serie ${produs.nume} mai sunt libere doar ${bucati(libere)}.` });
+      }
+
+      // Cu avans: plătește acum avansul (dar niciodată mai mult decât prețul), restul la livrare
+      const deIncasat = avans ? Math.min(PRECOMANDA.avans, produs.pretPrecomanda) : produs.pretPrecomanda;
+      restDePlata += (produs.pretPrecomanda - deIncasat) * qty;
+      const nume = avans
+        ? `Avans precomandă ${produs.nume} — ${produs.culoare}`
+        : `Precomandă ${produs.nume} — ${produs.culoare}`;
+
+      form.append(`line_items[${linie}][quantity]`, String(qty));
+      form.append(`line_items[${linie}][price_data][currency]`, 'ron');
+      form.append(`line_items[${linie}][price_data][unit_amount]`, String(deIncasat * 100)); // în bani
+      form.append(`line_items[${linie}][price_data][product_data][name]`, nume);
+      produseComandate.push(`${produs.id}:${qty}`);
+      linie += 1;
     }
+
+    if (linie === 0) {
+      return res.status(400).json({ error: 'Coșul e gol.' });
+    }
+
+    // Unde trimite Stripe clientul după plată sau renunțare
+    const origin = `https://${req.headers.host}`;
+    form.append('mode', 'payment');
+    form.append('locale', 'ro');
+    form.append('success_url', `${origin}/?plata=reusita`);
+    form.append('cancel_url', `${origin}/?plata=anulata`);
+    form.append('shipping_address_collection[allowed_countries][0]', 'RO'); // livrăm doar în România
+    form.append('phone_number_collection[enabled]', 'true');                // curierul are nevoie de telefon
+    form.append('custom_text[submit][message]', avans
+      ? `Plătești acum avansul. Restul de ${restDePlata.toLocaleString('ro-RO')} lei îl plătești la livrare, în ${PRECOMANDA.livrare}.`
+      : `Precomandă: livrare în ${PRECOMANDA.livrare}.`);
+
+    // Folosite de contorul de rezervări și ca să știi ce ai de livrat și de încasat
+    form.append('metadata[elen_produse]', produseComandate.join(','));
+    form.append('metadata[tip]', avans ? 'avans' : 'integral');
+    form.append('metadata[rest_de_plata_lei]', String(restDePlata));
+    form.append('metadata[livrare]', PRECOMANDA.livrare);
+    if (areAcces) form.append('metadata[acces_anticipat]', 'da');
+
+    const sesiune = await stripe('checkout/sessions', { method: 'POST', body: form });
     return res.status(200).json({ url: sesiune.url });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Plata nu s-a putut deschide. Încearcă din nou.' });
+    console.error('Eroare la plată:', error.message);
+    return res.status(502).json({ error: 'Plata nu s-a putut deschide. Încearcă din nou.' });
   }
 };

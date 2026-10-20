@@ -1,24 +1,27 @@
-# Elen Sunglasses — magazin online
+# Elen Sunglasses — precomenzi pentru prima serie
 
-Magazin de o pagină pentru ochelarii Elen, plus pagina „Cum le facem”. HTML, CSS și JavaScript simplu, fără build, gata de pus pe Vercel.
+Site-ul are un singur obiectiv: **precomenzi plătite pentru prima serie**, ca să finanțezi producția și să știi exact câte bucăți să faci din fiecare model. Are o pagină principală cu magazinul de precomenzi, plus pagina „Cum le facem”. HTML, CSS și JavaScript simplu, fără build, gata de pus pe Vercel.
 
 ```
 index.html          pagina principală (texte, ghid de mărimi, formulare)
 cum-le-facem.html   pagina despre producție
-products.js         LISTA DE PRODUSE: prețuri, stoc, dimensiuni, poze, lansări
+products.js         PRODUSELE și SETĂRILE DE PRECOMANDĂ (data livrării, avans)
 script.js           magazinul, coșul, plata (sus: SETĂRI PLATĂ)
 style.css           culori, fonturi, aranjare
-api/checkout.js     plata cu cardul prin Stripe (doar dacă o pornești)
+api/checkout.js     plata prin Stripe (integral sau avans)
+api/rezervari.js    contorul de rezervări, numărat din plățile Stripe
+api/_stripe.js      cod comun pentru cele două de mai sus
 images/             pozele tale + desenele folosite până le urci
 ```
 
 ## Înainte de prima comandă reală
 
 - [ ] Pozele tale urcate (vezi mai jos). Până atunci se văd desene.
-- [ ] Prețuri, stocuri, dimensiuni și specificații reale în `products.js`. Cele de acum sunt exemple.
+- [ ] Prețuri, prețuri de precomandă, mărimea seriilor, dimensiuni și specificații reale în `products.js`. Cele de acum sunt exemple.
+- [ ] **Data livrării** (`PRECOMANDA.livrare`) pe care o poți ține sigur. Pune o lună de rezervă.
 - [ ] Textele din `cum-le-facem.html` rescrise după procesul real al producătorului tău.
-- [ ] Livrarea (24–48 h), returul (30 de zile) și garanția confirmate. Apar în banda de sub prima poză, în coș și pe „Cum le facem”.
-- [ ] Paginile legale făcute și legate în subsol: termeni și condiții (cu dreptul de retragere de 14 zile și formularul de retragere), livrare și retur, politica de confidențialitate.
+- [ ] Răspunsurile din secțiunea „Cum funcționează” (banii înapoi la întârziere, anulare oricând, retur 30 de zile) sunt promisiuni. Păstrează doar ce poți respecta.
+- [ ] Paginile legale făcute și legate în subsol: termeni și condiții (cu condițiile precomenzii, data livrării, dreptul de retragere de 14 zile de la primirea coletului și formularul de retragere), livrare și retur, politica de confidențialitate.
 - [ ] Datele firmei în subsol (denumire, CUI, Nr. Reg. Com., adresă). Ambele pagini au `[EDIT ME]` acolo.
 - [ ] Verifică totul cu un avocat sau consultant. Linkurile ANPC/SAL din subsol sunt un punct de plecare, nu o garanție că ești în regulă.
 
@@ -53,13 +56,24 @@ Pentru fiecare model, trei poze care vând o pereche de 1.700 lei:
 
 Poți pune oricâte poze: adaugă-le în lista `poze` din `products.js`. Prima e cea principală. Fă pozele mai mici de 300 KB fiecare cu [squoosh.app](https://squoosh.app), ca site-ul să se încarce repede pe mobil.
 
-## Produse, prețuri și stoc
+## Produse și prețuri
 
 Totul e în `products.js`, un bloc `{ ... }` pentru fiecare model.
 
-- **Prețul** e în lei, cu TVA, număr întreg: `pret: 1690`.
-- **Stocul** (`stoc: 7`) e afișat pe site: „7 bucăți în stoc”, „Ultimele 2 bucăți”, „Stoc epuizat”. Nu scade singur. **Actualizează-l după fiecare vânzare** (editezi numărul, faci commit și push). Un stoc afișat greșit e o practică înșelătoare față de client. Dacă vinzi des, trece pe Shopify, care ține stocul automat.
-- **Dimensiunile** (`dimensiuni`) se măsoară pe rama reală, în milimetri. Din `totala` se calculează automat mărimea: mică (sub 137 mm), medie (137–145) sau mare (peste 145). Limitele se schimbă în funcția `marimeRama`.
+- **`pret`**: prețul întreg, după lansare, în lei cu TVA.
+- **`pretPrecomanda`**: ce plătește cine precomandă acum. Pe site apare „1.520 lei, 1.790 lei după lansare”.
+- **`serie`**: câte bucăți are prima serie. Când se rezervă toate, butonul devine „Anunță-mă la seria 2”.
+- **`dimensiuni`**: se măsoară pe rama reală, în milimetri. Din `totala` se calculează automat mărimea: mică (sub 137 mm), medie (137–145) sau mare (peste 145).
+
+Sus, în `PRECOMANDA`, sunt **data livrării** și **avansul pe pereche** (implicit 300 lei). Apar peste tot pe site din acest singur loc.
+
+## Contorul „34 din 100 rezervate”
+
+Cu Stripe pornit, contorul se numără singur din plățile reușite, se actualizează cam la 30 de secunde și e mereu adevărat. Serverul nu lasă pe nimeni să plătească peste mărimea seriei.
+
+Rezervările făcute în afara site-ului (telefon, Instagram) le adaugi în `rezervateManual`. O precomandă anulată și rambursată o scazi tot de acolo, cu un număr negativ (de exemplu `-1`).
+
+Fără nicio rezervare, site-ul scrie „Prima serie: 100 de bucăți”, nu „0 din 100”.
 
 ## Lansări și acces anticipat pentru abonați
 
@@ -71,48 +85,44 @@ lansare:      '2026-11-20T10:00:00+02:00',  // de când poate cumpăra oricine
 ```
 
 - Înainte de `accesAbonati`: toată lumea vede „În curând”.
-- Între cele două date: abonații cu link pot cumpăra, ceilalți văd „Doar pentru abonați”.
-- După `lansare`: e disponibil pentru toți.
+- Între cele două date: abonații cu link pot precomanda, ceilalți văd „Doar pentru abonați”.
+- După `lansare`: oricine poate precomanda.
 
 Abonaților le trimiți pe email linkul `https://domeniul-tau.ro/?acces=CODUL-TAU`. Alege un cod greu de ghicit și schimbă-l la fiecare lansare.
 
-- **La plata cu cardul (Stripe)**, codul e verificat pe server: pune-l în Vercel ca variabila `ACCES_ANTICIPAT_COD`. Cine nu are codul corect nu poate plăti.
-- **La ramburs**, codul apare în emailul comenzii și îl verifici tu.
+Codul e verificat pe server: pune-l în Vercel ca variabila `ACCES_ANTICIPAT_COD`. Cine nu are codul corect nu poate plăti.
 
 ## Plata
 
-Sus în `script.js`, secțiunea `PLATA`. Implicit totul e în **mod demo**: nimeni nu poate plăti, iar site-ul spune asta clar.
+Sus în `script.js`, `PLATA.card` e `'demo'`: nimeni nu poate plăti, iar site-ul spune asta clar. Clientul alege în coș între:
 
-### Card prin Stripe
+- **Avans acum** (300 lei pe pereche), restul la livrare.
+- **Tot acum**, la prețul de precomandă.
+
+### Pornește Stripe
 
 1. Fă cont pe [stripe.com](https://stripe.com) cu firma din România și copiază **cheia secretă** din Developers → API keys. Începe cu cea de test (`sk_test_...`).
-2. În Vercel: proiect → Settings → Environment Variables → adaugă `STRIPE_SECRET_KEY`. Redeploy.
+2. În Vercel: proiect → Settings → Environment Variables → adaugă `STRIPE_SECRET_KEY` (și `ACCES_ANTICIPAT_COD`, dacă folosești acces anticipat). Redeploy.
 3. În `script.js`: `card: 'stripe'`. Commit și push.
-4. Testează cu cardul `4242 4242 4242 4242`, orice dată din viitor, orice CVC. Apoi pune cheia live (`sk_live_...`).
+4. Testează cu cardul `4242 4242 4242 4242`, orice dată din viitor, orice CVC. Contorul de pe site trebuie să crească. Apoi pune cheia live (`sk_live_...`).
 
-Plata e în lei (RON), livrarea doar în România, iar Stripe cere telefonul pentru curier. Prețul și stocul sunt citite pe server din `products.js`, deci nu pot fi modificate din browser.
+Plata e în lei, livrarea doar în România, iar Stripe cere adresa și telefonul. Prețul și locurile din serie sunt verificate pe server.
 
-### Ramburs
+### Unde vezi precomenzile și cum încasezi restul
 
-Clientul completează adresa, iar comanda îți vine pe email.
+În Stripe → Payments, fiecare plată are la **Metadata**:
+- `elen_produse`: ce a comandat (`sola:1,lido:2`)
+- `tip`: `avans` sau `integral`
+- `rest_de_plata_lei`: cât mai are de plătit
+- `livrare`: luna promisă
 
-1. Fă un formular gratuit pe [formspree.io](https://formspree.io) și copiază adresa lui (`https://formspree.io/f/...`).
-2. În `script.js`: `ramburs: { activ: true, formspreeUrl: 'https://formspree.io/f/...' }`.
-3. Pentru fiecare comandă primești un email cu produsele, totalul, adresa și telefonul. Suni clientul ca să confirmi (la 1.700 lei merită, scade mult refuzurile la livrare), apoi generezi AWB-ul la curier (Fan Courier, Sameday, Cargus etc.).
+Exportă lista în CSV înainte să comanzi producția: ai acolo exact câte bucăți din fiecare model.
 
-Cât timp `formspreeUrl` e gol, comanda nu se trimite nicăieri, iar clientul vede „Mod demo”.
+La livrare, restul se încasează ramburs (treci suma pe AWB la curier) sau cu un Payment Link din Stripe trimis pe email. Pentru o precomandă anulată, dai Refund din Stripe și scazi 1 din `rezervateManual`.
 
-### În rate
+### Mai târziu: vânzare directă
 
-Nu se poate conecta fără un contract cu un furnizor. Variantele obișnuite în România:
-- **Rate fără dobândă pe cardul de credit** (Banca Transilvania Star, ING, BCR etc.), prin procesatori ca Netopia sau BT iPay.
-- **Cumpără acum, plătește mai târziu**: TBI Bank (tbi pay), Mokka, PayPo.
-
-Fiecare îți dă un plugin sau un link de plată după ce semnezi. Când ai unul, se adaugă ca a treia opțiune lângă card și ramburs. Dacă alegi Shopify, majoritatea au aplicații gata făcute.
-
-### Shopify (alternativa „totul într-un loc”)
-
-Dacă vrei stoc care scade singur, ramburs, card și rate fără să administrezi nimic din cod, mută produsele în Shopify. Pune `shopifyVariantId` la fiecare produs în `products.js`, apoi în `script.js` setează `card: 'shopify'` și `shopifyDomain`. Checkout-ul Shopify preia de acolo.
+După ce livrezi prima serie, site-ul poate redeveni magazin obișnuit, cu stoc, card, ramburs și rate. Versiunea aceea e în istoricul git (commit-ul „Adapt shop for Romania”).
 
 ## Formularul de abonare
 
