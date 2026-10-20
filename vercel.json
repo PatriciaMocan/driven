@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/agent-clienti.js": { "maxDuration": 300 }
+  },
+  "headers": [
+    {
+      "source": "/agent.html",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
