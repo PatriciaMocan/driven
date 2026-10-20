@@ -1,0 +1,8 @@
+{
+  "name": "elen-sunglasses",
+  "private": true,
+  "description": "Site-ul Elen Sunglasses. Dependența de mai jos e doar pentru agentul de clienți (api/agent-clienti.js); Vercel o instalează singur.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  }
+}

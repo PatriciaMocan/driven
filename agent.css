@@ -1,0 +1,170 @@
+/* =========================================================
+   Elen — pagina Agentului de clienți (agent.html)
+   Folosește culorile și fonturile din style.css.
+   ========================================================= */
+
+.agent-page { min-height: 100vh; }
+
+.agent-header { border-bottom: 1px solid var(--color-line); }
+.agent-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.agent-header-title {
+  margin: 0;
+  flex: 1;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.agent-main { padding-top: 2rem; padding-bottom: 4rem; }
+
+.agent-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.agent-link:hover { color: var(--color-accent); }
+.agent-link:disabled { opacity: 0.6; cursor: wait; }
+
+.agent-login { max-width: 28rem; margin: 3rem auto; }
+.agent-login .field { margin-top: 2rem; }
+.agent-login input {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+}
+.agent-error { color: var(--color-error); font-size: 0.875rem; min-height: 1em; }
+
+.agent-h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+.agent-count { color: var(--color-muted); font-size: 1.2rem; }
+
+/* ---------- Căutare ---------- */
+.agent-panel {
+  background: var(--color-beige);
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 2.5rem;
+  border-radius: var(--radius);
+}
+.agent-search { display: grid; gap: 1rem; }
+.agent-search .field { margin: 0; }
+.agent-search .field[hidden] { display: none; }
+.agent-search-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.agent-status { margin: 0; color: var(--color-muted); font-size: 0.9rem; flex: 1; min-width: 14rem; }
+
+/* ---------- Bara de deasupra tabelului ---------- */
+.agent-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem 1.5rem;
+}
+.agent-toolbar .agent-h2 { margin-right: auto; }
+.agent-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.agent-files { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+.agent-page select,
+.agent-page textarea,
+.agent-rescrie input {
+  font: inherit;
+  font-size: 1rem;            /* 16px: iPhone nu mai face zoom */
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  max-width: 100%;
+}
+.agent-page textarea { width: 100%; line-height: 1.5; resize: vertical; margin-top: 0.5rem; }
+.agent-page select:focus,
+.agent-page textarea:focus,
+.agent-rescrie input:focus { border-color: var(--color-text); outline: none; }
+
+.agent-note { color: var(--color-muted); font-size: 0.85rem; max-width: 46rem; margin: 1rem 0 1.5rem; }
+
+/* ---------- Tabel ---------- */
+.agent-table { width: 100%; border-collapse: collapse; }
+.agent-table thead { display: none; }
+.agent-table tr {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.agent-table td { display: block; padding: 0.5rem 0; vertical-align: top; }
+
+.agent-nume { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; text-decoration: none; }
+.agent-nume:hover { color: var(--color-accent); }
+.agent-mic { display: block; color: var(--color-muted); font-size: 0.8rem; line-height: 1.5; overflow-wrap: anywhere; }
+.agent-mic a { color: var(--color-muted); }
+.agent-dece { font-size: 0.9rem; margin: 0.5rem 0; }
+.agent-sterge { margin-top: 0.5rem; font-size: 0.8rem; color: var(--color-muted); }
+
+.agent-nota {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.agent-nota::after { content: '/100'; font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin-left: 0.15rem; }
+.nota-mare { color: #3F6B3A; }
+.nota-medie { color: var(--color-text); }
+.nota-mica { color: var(--color-muted); }
+
+.agent-rescrie { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; margin-top: 0.5rem; }
+.agent-rescrie input { flex: 1; min-width: 12rem; font-size: 0.9rem; }
+.agent-actiuni { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+
+.stadiu-respins, .stadiu-refuzat { opacity: 0.6; }
+.stadiu-de_aprobat { border-left: 3px solid var(--color-accent) !important; }
+
+.agent-empty { color: var(--color-muted); padding: 2rem 0; }
+
+/* ---------- Ecrane mari: tabel adevărat ---------- */
+@media (min-width: 700px) {
+  .agent-search { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; }
+  .agent-search-actions { grid-column: 1 / -1; }
+}
+
+@media (min-width: 1000px) {
+  .agent-table thead { display: table-header-group; }
+  .agent-table th {
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding: 0 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .agent-table tr { display: table-row; border: 0; padding: 0; background: none; }
+  .agent-table tbody tr { border-bottom: 1px solid var(--color-line); }
+  .agent-table td { display: table-cell; padding: 1.25rem 1rem 1.25rem 0; }
+  .col-nume { width: 26%; }
+  .col-nota { width: 14%; }
+  .col-stadiu { width: 14%; }
+  .stadiu-de_aprobat { border-left: 0 !important; }
+  .stadiu-de_aprobat .col-nume { box-shadow: inset 3px 0 0 var(--color-accent); padding-left: 0.75rem; }
+}
+
+/* Câmpul „Oraș” la aceeași înălțime cu listele de lângă el */
+.agent-search .field input[type="text"] { padding: 0.5rem 0.75rem; }

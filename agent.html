@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Pagină privată: nu apare în Google și nu e legată de pe site.
+       Intri cu parola pusă în Vercel (AGENT_PAROLA). Vezi README, „Agentul de clienți”. -->
+  <title>Agent clienți — Elen</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F7F4EE">
+
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="agent.css">
+</head>
+<body class="agent-page">
+
+  <header class="agent-header">
+    <div class="container agent-header-inner">
+      <a href="index.html" class="logo">Elen</a>
+      <p class="agent-header-title">Agent clienți</p>
+      <button type="button" class="agent-link" id="iesire" hidden>Ieși</button>
+    </div>
+  </header>
+
+  <main class="container agent-main">
+
+    <!-- ================= PAROLA ================= -->
+    <section id="ecran-parola" class="agent-login">
+      <h1 class="section-title">Agentul de clienți</h1>
+      <p class="section-intro">Caută creatori și locuri care ar putea vinde ochelarii, le dă note și îți pregătește mesajele. Nu trimite nimic fără tine.</p>
+      <form id="form-parola" class="field">
+        <label for="parola">Parola</label>
+        <input type="password" id="parola" autocomplete="current-password" required>
+        <p class="agent-error" id="parola-eroare" role="alert"></p>
+        <button class="btn btn-primary" type="submit">Intră</button>
+      </form>
+    </section>
+
+    <div id="ecran-agent" hidden>
+
+      <!-- ================= CĂUTARE ================= -->
+      <section class="agent-panel" aria-labelledby="cauta-titlu">
+        <h2 id="cauta-titlu" class="agent-h2">Caută prospecți noi</h2>
+        <form id="form-cauta" class="agent-search">
+          <div class="field">
+            <label for="categorie">Pe cine caută</label>
+            <select id="categorie">
+              <optgroup label="Creatori de conținut (5–50 mii de urmăritori)">
+                <option value="creatori-moda">Creatori · modă</option>
+                <option value="creatori-lifestyle">Creatori · lifestyle</option>
+                <option value="creatori-travel">Creatori · travel</option>
+              </optgroup>
+              <optgroup label="Locuri care pot vinde ochelarii">
+                <option value="buticuri">Buticuri și concept store-uri</option>
+                <option value="saloane">Saloane premium</option>
+                <option value="hoteluri">Hoteluri boutique</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field" id="camp-platforma">
+            <label for="platforma">Unde</label>
+            <select id="platforma">
+              <option value="ambele">Instagram și TikTok</option>
+              <option value="instagram">Doar Instagram</option>
+              <option value="tiktok">Doar TikTok</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="oras">Oraș <span class="optional">(opțional)</span></label>
+            <input type="text" id="oras" placeholder="ex. Cluj-Napoca, Constanța">
+          </div>
+          <div class="field">
+            <label for="cati">Câți odată</label>
+            <select id="cati">
+              <option>4</option>
+              <option selected>6</option>
+              <option>8</option>
+              <option>10</option>
+            </select>
+          </div>
+          <div class="agent-search-actions">
+            <button class="btn btn-primary" type="submit" id="buton-cauta">Caută</button>
+            <p class="agent-status" id="cauta-status" role="status"></p>
+          </div>
+        </form>
+      </section>
+
+      <!-- ================= TABEL ================= -->
+      <section aria-labelledby="tabel-titlu">
+        <div class="agent-toolbar">
+          <h2 id="tabel-titlu" class="agent-h2">Prospecți <span class="agent-count" id="numar"></span></h2>
+          <div class="agent-filters">
+            <label class="visually-hidden" for="filtru-stadiu">Stadiu</label>
+            <select id="filtru-stadiu"></select>
+            <label class="visually-hidden" for="filtru-categorie">Categorie</label>
+            <select id="filtru-categorie"></select>
+          </div>
+          <div class="agent-files">
+            <button type="button" class="agent-link" id="export-csv">Descarcă tabelul (CSV)</button>
+            <button type="button" class="agent-link" id="export-copie">Salvează o copie</button>
+            <label class="agent-link" for="import-copie">Încarcă o copie</label>
+            <input type="file" id="import-copie" accept="application/json,.json" hidden>
+          </div>
+        </div>
+
+        <p class="agent-note">
+          Lista e păstrată doar în acest browser. Salvează o copie din când în când și încarc-o dacă lucrezi de pe alt calculator.
+          Numărul de urmăritori și notele sunt ale agentului: verifică profilul înainte să aprobi.
+        </p>
+
+        <div class="agent-table-wrap">
+          <table class="agent-table">
+            <thead>
+              <tr>
+                <th scope="col">Nume</th>
+                <th scope="col">Notă</th>
+                <th scope="col">Mesajul propus</th>
+                <th scope="col">Stadiu</th>
+              </tr>
+            </thead>
+            <tbody id="randuri"></tbody>
+          </table>
+          <p class="agent-empty" id="gol">Încă nu ai prospecți. Alege o categorie și apasă „Caută”.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="agent.js"></script>
+</body>
+</html>

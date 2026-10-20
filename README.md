@@ -12,6 +12,9 @@ style.css           culori, fonturi, aranjare
 api/checkout.js     plata prin Stripe (integral sau avans)
 api/rezervari.js    contorul de rezervări, numărat din plățile Stripe
 api/_stripe.js      cod comun pentru cele două de mai sus
+agent.html          AGENTUL DE CLIENȚI: pagină privată, cu parolă (vezi mai jos)
+agent.js, agent.css tabelul agentului
+api/agent-clienti.js căutarea, notele și mesajele (sus: SETĂRI AGENT)
 images/             pozele tale + desenele folosite până le urci
 
 agent-vanzari.js    AGENTUL DE VÂNZĂRI: setări și textele emailurilor
@@ -248,3 +251,35 @@ Pentru evenimente noi, rapoarte sau un serviciu nou, proiectul are un agent Clau
 - **Texte:** în `index.html` și `cum-le-facem.html`. Fiecare secțiune începe cu un comentariu de forma `<!-- ===== 5. DESPRE ===== -->`. Povestea brandului e marcată cu `[EDIT ME]`.
 - **Culori și fonturi:** blocul `:root` din începutul `style.css`. Culoarea de accent e `--color-accent`.
 - **Domeniul:** înlocuiește `https://elensunglasses.ro` din etichetele `og:` ale ambelor pagini cu domeniul tău real.
+
+## Agentul de clienți
+
+O pagină privată, `domeniul-tau.ro/agent.html`, care caută oameni care ar putea cumpăra sau vinde ochelarii și îți pregătește mesajele. **Nu trimite nimic.** Tu citești, aprobi și trimiți.
+
+- **Caută** pe Instagram și TikTok creatori din România pe modă, lifestyle și travel, cu 5–50 de mii de urmăritori, plus buticuri, saloane premium și hoteluri boutique. Poți alege orașul.
+- **Dă note** de la 0 la 10 pentru estetică, public și branduri de lux promovate, și o notă finală din 100 (estetica 40%, publicul 35%, luxul 25%).
+- **Scrie un mesaj** pentru fiecare: colaborare, produs cadou, cod de reducere sau, pentru afaceri, să vândă ochelarii la ei. Îl poți edita sau îi poți cere agentului să-l rescrie („mai scurt”, „mai cald”).
+- **Tabelul** are numele, linkul, nota, mesajul și stadiul: De aprobat → Aprobat → Trimis → A răspuns → Colaborăm / Nu e interesat. Îl descarci ca CSV pentru Excel.
+
+Cum lucrezi cu el:
+1. Alegi categoria și apeși **Caută**. Durează 1–4 minute.
+2. Deschizi profilul, verifici că se potrivește, citești mesajul și apeși **Aprobă mesajul**. Dacă schimbi un mesaj aprobat, trebuie aprobat din nou.
+3. **Copiază și deschide profilul** copiază mesajul și deschide Instagramul sau TikTok-ul persoanei. Îl trimiți tu, din contul tău, apoi apeși **L-am trimis**.
+4. Când îți răspund, schimbi stadiul din listă.
+
+### Pornește agentul
+
+1. Fă cont pe [console.anthropic.com](https://console.anthropic.com), pune bani în cont (Billing) și creează o cheie în Settings → API keys.
+2. În Vercel → Settings → Environment Variables adaugă:
+   - `ANTHROPIC_API_KEY`: cheia de mai sus
+   - `AGENT_PAROLA`: parola cu care intri în `agent.html`. Alege una lungă.
+3. Redeploy. Vercel instalează singur ce trebuie (din `package.json`).
+4. Sus în `api/agent-clienti.js`, la **SETĂRI AGENT**, pune Instagramul tău, semnătura și ce reducere oferi. Agentul le folosește în mesaje.
+
+### De știut
+
+- **Costul:** o căutare de 6 prospecți costă de obicei câțiva lei (căutări web + scris). O rescriere de mesaj, câțiva bani. Vezi consumul în console.anthropic.com → Usage și pune o limită lunară acolo.
+- **Verifică înainte să aprobi.** Agentul pune doar conturi găsite în căutare și lasă gol numărul de urmăritori când nu l-a văzut, dar Instagram și TikTok nu arată tot în căutări: deschide profilul și uită-te singură.
+- **Lista stă în browser.** Dacă ștergi datele browserului sau schimbi calculatorul, o pierzi. Apasă din când în când **Salvează o copie** și, pe alt calculator, **Încarcă o copie**.
+- Pagina nu apare în Google și nu e legată de pe site. Fără parolă, agentul nu pornește.
+- Instagram și TikTok limitează mesajele trimise unor conturi noi. Trimite câteva pe zi, nu zeci deodată.
