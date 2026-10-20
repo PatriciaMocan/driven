@@ -1,61 +1,85 @@
 /* =========================================================
-   Stripe checkout (a Vercel serverless function)
-   Only used when CHECKOUT.mode is 'stripe' in script.js.
+   Plata cu cardul prin Stripe (o funcție serverless Vercel)
+   Folosită doar când PLATA.card este 'stripe' în script.js.
 
-   The browser sends { items: [{ id, qty }] }. This function looks up
-   the real prices in products.js, asks Stripe for a checkout page,
-   and sends back its URL. Your secret key never reaches the browser.
+   Browserul trimite { items: [{ id, qty }], acces: 'COD' }. Funcția:
+     - ia prețurile și stocul din products.js (nu din browser)
+     - verifică dacă modelele nelansate sunt cumpărate cu un cod de acces valid
+     - cere de la Stripe o pagină de plată în lei și trimite înapoi adresa ei
+   Cheia secretă nu ajunge niciodată în browser.
 
-   Setup (once): in Vercel, open your project > Settings > Environment
-   Variables and add STRIPE_SECRET_KEY with your key from
-   https://dashboard.stripe.com/apikeys (use the sk_test_... key first).
-   No npm install needed: it talks to Stripe's API directly.
+   Setare (o singură dată), în Vercel > proiectul tău > Settings > Environment Variables:
+     STRIPE_SECRET_KEY     cheia de la https://dashboard.stripe.com/apikeys (începe cu sk_test_ sau sk_live_)
+     ACCES_ANTICIPAT_COD   codul din linkul trimis abonaților (ex. NORA-ABONATI)
+   Nu e nevoie de npm install: funcția vorbește direct cu API-ul Stripe.
    ========================================================= */
 
-const PRODUCTS = require('../products.js');
+const { PRODUCTS, etapaLansare } = require('../products.js');
 
-// Countries you ship to (two-letter codes). Edit to match your shipping policy.
-const SHIP_TO = ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE',
-  'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'];
+const MAX_BUCATI = 10; // aceeași limită ca în script.js
+
+// 1 bucată, 5 bucăți, 20 de bucăți
+function bucati(n) {
+  if (n === 1) return '1 bucată';
+  const rest = n % 100;
+  return n + (rest === 0 || rest >= 20 ? ' de bucăți' : ' bucăți');
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Use POST' });
+    return res.status(405).json({ error: 'Folosește POST' });
   }
   if (!process.env.STRIPE_SECRET_KEY) {
-    return res.status(500).json({ error: 'STRIPE_SECRET_KEY is not set in Vercel' });
+    return res.status(500).json({ error: 'Plata cu cardul nu e configurată încă.' });
   }
 
-  const items = (req.body && Array.isArray(req.body.items)) ? req.body.items : [];
+  const body = req.body || {};
+  const items = Array.isArray(body.items) ? body.items : [];
+  const codCorect = process.env.ACCES_ANTICIPAT_COD;
+  const areAcces = Boolean(codCorect) && body.acces === codCorect;
 
-  // Stripe expects form-encoded fields like line_items[0][quantity]=1
+  // Stripe vrea câmpuri de forma line_items[0][quantity]=1
   const form = new URLSearchParams();
-  let line = 0;
+  let linie = 0;
   for (const item of items) {
-    const product = PRODUCTS.find((p) => p.id === item.id);
+    const produs = PRODUCTS.find((p) => p.id === item.id);
     const qty = Math.floor(Number(item.qty));
-    if (!product || !(qty >= 1 && qty <= 10)) continue; // ignore anything unexpected
+    if (!produs || !(qty >= 1 && qty <= MAX_BUCATI)) continue; // ignorăm ce nu e în regulă
 
-    form.append(`line_items[${line}][quantity]`, String(qty));
-    form.append(`line_items[${line}][price_data][currency]`, 'eur');
-    form.append(`line_items[${line}][price_data][unit_amount]`, String(product.price * 100)); // in cents
-    form.append(`line_items[${line}][price_data][product_data][name]`, `${product.name} — ${product.colour}`);
-    line += 1;
+    const etapa = etapaLansare(produs);
+    if (etapa === 'curand' || (etapa === 'abonati' && !areAcces)) {
+      return res.status(403).json({ error: `${produs.nume} nu e încă disponibil. Ai nevoie de linkul de acces anticipat.` });
+    }
+    if (produs.stoc <= 0) {
+      return res.status(409).json({ error: `${produs.nume} s-a epuizat.` });
+    }
+    if (qty > produs.stoc) {
+      return res.status(409).json({ error: `Mai avem doar ${bucati(produs.stoc)} din ${produs.nume}.` });
+    }
+
+    form.append(`line_items[${linie}][quantity]`, String(qty));
+    form.append(`line_items[${linie}][price_data][currency]`, 'ron');
+    form.append(`line_items[${linie}][price_data][unit_amount]`, String(produs.pret * 100)); // în bani
+    form.append(`line_items[${linie}][price_data][product_data][name]`, `${produs.nume} — ${produs.culoare}`);
+    linie += 1;
   }
 
-  if (line === 0) {
-    return res.status(400).json({ error: 'The bag is empty' });
+  if (linie === 0) {
+    return res.status(400).json({ error: 'Coșul e gol.' });
   }
 
-  // Where Stripe sends people after paying or cancelling
+  // Unde trimite Stripe clientul după plată sau renunțare
   const origin = `https://${req.headers.host}`;
   form.append('mode', 'payment');
-  form.append('success_url', `${origin}/?checkout=success`);
-  form.append('cancel_url', `${origin}/?checkout=cancelled`);
-  SHIP_TO.forEach((country, i) => form.append(`shipping_address_collection[allowed_countries][${i}]`, country));
+  form.append('locale', 'ro');
+  form.append('success_url', `${origin}/?plata=reusita`);
+  form.append('cancel_url', `${origin}/?plata=anulata`);
+  form.append('shipping_address_collection[allowed_countries][0]', 'RO'); // livrăm doar în România
+  form.append('phone_number_collection[enabled]', 'true');                // curierul are nevoie de telefon
+  if (areAcces) form.append('metadata[acces_anticipat]', 'da');
 
   try {
-    const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    const raspuns = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
@@ -63,15 +87,15 @@ module.exports = async (req, res) => {
       },
       body: form
     });
-    const session = await stripeResponse.json();
+    const sesiune = await raspuns.json();
 
-    if (!stripeResponse.ok) {
-      console.error('Stripe error:', session.error && session.error.message);
-      return res.status(502).json({ error: 'Stripe could not create the checkout' });
+    if (!raspuns.ok) {
+      console.error('Eroare Stripe:', sesiune.error && sesiune.error.message);
+      return res.status(502).json({ error: 'Plata nu s-a putut deschide. Încearcă din nou.' });
     }
-    return res.status(200).json({ url: session.url });
+    return res.status(200).json({ url: sesiune.url });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Checkout failed' });
+    return res.status(500).json({ error: 'Plata nu s-a putut deschide. Încearcă din nou.' });
   }
 };

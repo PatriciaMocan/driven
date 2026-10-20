@@ -1,77 +1,125 @@
-# Elen Sunglasses — shop
+# Elen Sunglasses — magazin online
 
-A one-page shop for Elen's luxury sunglasses. Plain HTML, CSS and JavaScript, no build step, ready for Vercel.
+Magazin de o pagină pentru ochelarii Elen, plus pagina „Cum le facem”. HTML, CSS și JavaScript simplu, fără build, gata de pus pe Vercel.
 
 ```
-index.html        page layout and text
-products.js       THE PRODUCT LIST: names, prices, photos, descriptions
-style.css         colours, fonts, layout
-script.js         shop grid, filters, quick view, bag, checkout, newsletter form
-api/checkout.js   Stripe checkout (only used if you switch checkout to Stripe)
-images/           favicon, share image, and fallback placeholders
+index.html          pagina principală (texte, ghid de mărimi, formulare)
+cum-le-facem.html   pagina despre producție
+products.js         LISTA DE PRODUSE: prețuri, stoc, dimensiuni, poze, lansări
+script.js           magazinul, coșul, plata (sus: SETĂRI PLATĂ)
+style.css           culori, fonturi, aranjare
+api/checkout.js     plata cu cardul prin Stripe (doar dacă o pornești)
+images/             pozele tale + desenele folosite până le urci
 ```
 
-## Before you take real orders
+## Înainte de prima comandă reală
 
-- **The photos are stand-ins.** They are free stock photos from [Unsplash](https://unsplash.com) (free for commercial use), but they show other people's sunglasses, not Elen frames. Selling a product with a photo of a different product misleads customers, so replace every photo with your own before switching checkout on.
-- **Check every claim against your real products and policies:** prices, materials ("Italian acetate", "titanium"), lens specs, "free EU shipping", "30-day returns" and "2-year warranty".
-- **Add the legal pages** linked in the footer (shipping & returns, terms of sale, privacy policy, legal notice). EU online shops are required to have them, including information about the 14-day right of withdrawal.
+- [ ] Pozele tale urcate (vezi mai jos). Până atunci se văd desene.
+- [ ] Prețuri, stocuri, dimensiuni și specificații reale în `products.js`. Cele de acum sunt exemple.
+- [ ] Textele din `cum-le-facem.html` rescrise după procesul real al producătorului tău.
+- [ ] Livrarea (24–48 h), returul (30 de zile) și garanția confirmate. Apar în banda de sub prima poză, în coș și pe „Cum le facem”.
+- [ ] Paginile legale făcute și legate în subsol: termeni și condiții (cu dreptul de retragere de 14 zile și formularul de retragere), livrare și retur, politica de confidențialitate.
+- [ ] Datele firmei în subsol (denumire, CUI, Nr. Reg. Com., adresă). Ambele pagini au `[EDIT ME]` acolo.
+- [ ] Verifică totul cu un avocat sau consultant. Linkurile ANPC/SAL din subsol sunt un punct de plecare, nu o garanție că ești în regulă.
 
-## Preview it
+## Vezi site-ul local
 
-Double-click `index.html`. Everything works locally except Stripe checkout, which only runs once the site is on Vercel.
+Dublu-click pe `index.html`. Merge tot, mai puțin plata cu cardul prin Stripe, care funcționează doar pe Vercel.
 
-## Deploy to Vercel
+## Pune-l pe Vercel
 
-1. On [vercel.com/new](https://vercel.com/new), import this GitHub repository.
-2. Framework preset: **Other**. Leave the build command empty. Click **Deploy**.
+1. Pe [vercel.com/new](https://vercel.com/new), importă acest repository de pe GitHub.
+2. Framework preset: **Other**. Lasă build command gol. Apasă **Deploy**.
 
-Every push to GitHub redeploys automatically.
+Fiecare push pe GitHub republică site-ul automat.
 
-## Add, remove or edit products
+## Pozele tale
 
-Open `products.js`. Each product is one `{ ... }` block. Copy a block to add a product, delete one to remove it. Prices are in euros including VAT, as whole numbers (`price: 340`).
+Pune fișierele în folderele de mai jos, **cu exact aceste nume**, și apar singure. Dacă o poză lipsește, se vede desenul în locul ei, nu o imagine stricată.
 
-The filter buttons use the `material` field: `"acetate"`, `"metal"` or `"mixed"` (shown as "Browline").
+| Unde | Fișier | Format |
+|---|---|---|
+| Prima poză, pagina principală | `images/hero.jpg` | orizontală, minim 2000 px lățime |
+| Secțiunea „Despre” | `images/despre.jpg` | verticală 4:5, ~1200 px |
+| Produse | `images/produse/sola-1.jpg`, `sola-2.jpg`, `sola-3.jpg` (la fel pentru fiecare model) | verticală 4:5, ~1200 px |
+| „Cum le facem”, sus | `images/atelier-hero.jpg` | orizontală, minim 2000 px |
+| „Cum le facem”, pașii 1–6 | `images/atelier-1.jpg` … `atelier-6.jpg` | orizontală 4:3, ~1200 px |
+| Previzualizare la share | `images/og-image.png` | exact 1200 × 630 |
 
-## Replace the photos
+Pentru fiecare model, trei poze care vând o pereche de 1.700 lei:
+1. **Din față**, pe fundal neutru (bej sau alb cald), ochelarii deschiși. Asta apare pe card.
+2. **Din trei sferturi**, ca să se vadă grosimea acetatului și balamaua.
+3. **Purtați**, pe o persoană, la lumină naturală.
 
-1. Put your photos in `images/`. JPG or WebP, about 1200px wide, portrait (4:5) works best, under 300 KB each ([squoosh.app](https://squoosh.app) shrinks them).
-2. In `products.js`, change `image` to the file, e.g. `image: 'images/sola.jpg'`, and update `imageAlt` to describe the photo. Delete the `credit` line.
-3. The hero and About photos are in `index.html`: search for `unsplash.com` and replace those links the same way.
-4. When no Unsplash photos are left, remove the "Placeholder photos from Unsplash" line in the footer.
+Poți pune oricâte poze: adaugă-le în lista `poze` din `products.js`. Prima e cea principală. Fă pozele mai mici de 300 KB fiecare cu [squoosh.app](https://squoosh.app), ca site-ul să se încarce repede pe mobil.
 
-If a photo ever fails to load, the site automatically shows the matching drawing from `images/` (`model-sola.svg` and so on) instead of a broken image.
+## Produse, prețuri și stoc
 
-## Turn on checkout
+Totul e în `products.js`, un bloc `{ ... }` pentru fiecare model.
 
-Open `script.js`. At the top, `CHECKOUT.mode` is `'demo'`, which means nobody can pay yet. Pick one:
+- **Prețul** e în lei, cu TVA, număr întreg: `pret: 1690`.
+- **Stocul** (`stoc: 7`) e afișat pe site: „7 bucăți în stoc”, „Ultimele 2 bucăți”, „Stoc epuizat”. Nu scade singur. **Actualizează-l după fiecare vânzare** (editezi numărul, faci commit și push). Un stoc afișat greșit e o practică înșelătoare față de client. Dacă vinzi des, trece pe Shopify, care ține stocul automat.
+- **Dimensiunile** (`dimensiuni`) se măsoară pe rama reală, în milimetri. Din `totala` se calculează automat mărimea: mică (sub 137 mm), medie (137–145) sau mare (peste 145). Limitele se schimbă în funcția `marimeRama`.
 
-### Stripe (recommended if you don't have a shop platform)
+## Lansări și acces anticipat pentru abonați
 
-1. Create a [Stripe](https://stripe.com) account and copy your **secret key** from Developers → API keys. Start with the test key (`sk_test_...`).
-2. In Vercel: your project → Settings → Environment Variables → add `STRIPE_SECRET_KEY` with that key. Redeploy.
-3. In `script.js`, set `mode: 'stripe'`, commit and push.
-4. Test with card number `4242 4242 4242 4242`, any future date, any CVC. When it works, swap in your live key (`sk_live_...`).
+Un produs nou primește două date în `products.js` (vezi Nora ca exemplu):
 
-Prices are read from `products.js` on the server, so nobody can change them in their browser. To change which countries you ship to, edit `SHIP_TO` in `api/checkout.js`. For VAT and tax settings, see Stripe Tax in your Stripe dashboard.
+```js
+accesAbonati: '2026-11-18T10:00:00+02:00',  // de când pot cumpăra abonații
+lansare:      '2026-11-20T10:00:00+02:00',  // de când poate cumpăra oricine
+```
 
-### Shopify
+- Înainte de `accesAbonati`: toată lumea vede „În curând”.
+- Între cele două date: abonații cu link pot cumpăra, ceilalți văd „Doar pentru abonați”.
+- După `lansare`: e disponibil pentru toți.
 
-Use this if your products, stock and payments live in Shopify.
+Abonaților le trimiți pe email linkul `https://domeniul-tau.ro/?acces=CODUL-TAU`. Alege un cod greu de ghicit și schimbă-l la fiecare lansare.
 
-1. Find each product's **variant ID** in Shopify admin (open the product, click the variant; the number at the end of the URL).
-2. Put it in `products.js` as `shopifyVariantId: '1234567890'`.
-3. In `script.js`, set `mode: 'shopify'` and `shopifyDomain: 'your-store.myshopify.com'`.
+- **La plata cu cardul (Stripe)**, codul e verificat pe server: pune-l în Vercel ca variabila `ACCES_ANTICIPAT_COD`. Cine nu are codul corect nu poate plăti.
+- **La ramburs**, codul apare în emailul comenzii și îl verifici tu.
 
-Checkout then opens Shopify's own checkout with the bag already filled in.
+## Plata
 
-## Connect the newsletter form
+Sus în `script.js`, secțiunea `PLATA`. Implicit totul e în **mod demo**: nimeni nu poate plăti, iar site-ul spune asta clar.
 
-The form shows a thank-you message but doesn't save anything yet. In `script.js`, look for **CONNECT YOUR EMAIL SERVICE HERE** for Formspree and Mailchimp steps.
+### Card prin Stripe
 
-## Change text, colours and fonts
+1. Fă cont pe [stripe.com](https://stripe.com) cu firma din România și copiază **cheia secretă** din Developers → API keys. Începe cu cea de test (`sk_test_...`).
+2. În Vercel: proiect → Settings → Environment Variables → adaugă `STRIPE_SECRET_KEY`. Redeploy.
+3. În `script.js`: `card: 'stripe'`. Commit și push.
+4. Testează cu cardul `4242 4242 4242 4242`, orice dată din viitor, orice CVC. Apoi pune cheia live (`sk_live_...`).
 
-- **Text:** all in `index.html`; each section starts with a comment like `<!-- ===== 4. ABOUT ===== -->`. The brand story is marked `[EDIT ME]`.
-- **Colours and fonts:** the `:root` block at the top of `style.css`. The accent colour is `--color-accent`.
-- **Share preview:** the `og:` tags at the top of `index.html`. Replace `https://elensunglasses.com` with your real domain.
+Plata e în lei (RON), livrarea doar în România, iar Stripe cere telefonul pentru curier. Prețul și stocul sunt citite pe server din `products.js`, deci nu pot fi modificate din browser.
+
+### Ramburs
+
+Clientul completează adresa, iar comanda îți vine pe email.
+
+1. Fă un formular gratuit pe [formspree.io](https://formspree.io) și copiază adresa lui (`https://formspree.io/f/...`).
+2. În `script.js`: `ramburs: { activ: true, formspreeUrl: 'https://formspree.io/f/...' }`.
+3. Pentru fiecare comandă primești un email cu produsele, totalul, adresa și telefonul. Suni clientul ca să confirmi (la 1.700 lei merită, scade mult refuzurile la livrare), apoi generezi AWB-ul la curier (Fan Courier, Sameday, Cargus etc.).
+
+Cât timp `formspreeUrl` e gol, comanda nu se trimite nicăieri, iar clientul vede „Mod demo”.
+
+### În rate
+
+Nu se poate conecta fără un contract cu un furnizor. Variantele obișnuite în România:
+- **Rate fără dobândă pe cardul de credit** (Banca Transilvania Star, ING, BCR etc.), prin procesatori ca Netopia sau BT iPay.
+- **Cumpără acum, plătește mai târziu**: TBI Bank (tbi pay), Mokka, PayPo.
+
+Fiecare îți dă un plugin sau un link de plată după ce semnezi. Când ai unul, se adaugă ca a treia opțiune lângă card și ramburs. Dacă alegi Shopify, majoritatea au aplicații gata făcute.
+
+### Shopify (alternativa „totul într-un loc”)
+
+Dacă vrei stoc care scade singur, ramburs, card și rate fără să administrezi nimic din cod, mută produsele în Shopify. Pune `shopifyVariantId` la fiecare produs în `products.js`, apoi în `script.js` setează `card: 'shopify'` și `shopifyDomain`. Checkout-ul Shopify preia de acolo.
+
+## Formularul de abonare
+
+Arată mesajul de mulțumire, dar nu salvează încă adresele. În `script.js`, caută **AICI CONECTEZI SERVICIUL DE EMAIL** (Formspree sau Mailchimp).
+
+## Texte, culori, fonturi
+
+- **Texte:** în `index.html` și `cum-le-facem.html`. Fiecare secțiune începe cu un comentariu de forma `<!-- ===== 5. DESPRE ===== -->`. Povestea brandului e marcată cu `[EDIT ME]`.
+- **Culori și fonturi:** blocul `:root` din începutul `style.css`. Culoarea de accent e `--color-accent`.
+- **Domeniul:** înlocuiește `https://elensunglasses.ro` din etichetele `og:` ale ambelor pagini cu domeniul tău real.

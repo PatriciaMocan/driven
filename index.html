@@ -1,52 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ===== Page title and description (shown in Google results) ===== -->
-  <title>Elen Sunglasses — Handmade luxury sunglasses</title>
-  <meta name="description" content="Elen makes luxury sunglasses in small runs: Italian acetate, titanium and polarised lenses. Free EU shipping, 30-day returns.">
+  <!-- ===== Titlul și descrierea paginii (apar în Google) ===== -->
+  <title>Elen Sunglasses — Ochelari de soare de lux, făcuți în serii mici</title>
+  <meta name="description" content="Ochelari de soare din acetat italian și titan, cu lentile polarizate. Livrare gratuită în toată România în 24–48 h, plată cu cardul sau ramburs.">
   <meta name="theme-color" content="#F7F4EE">
 
-  <!-- ===== Open Graph tags (the preview card when the link is shared) =====
-       Replace https://elensunglasses.com with your real domain. -->
+  <!-- ===== Open Graph (previzualizarea când trimiți linkul) =====
+       Înlocuiește https://elensunglasses.ro cu domeniul tău real. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Elen Sunglasses">
-  <meta property="og:title" content="Elen Sunglasses — Handmade luxury sunglasses">
-  <meta property="og:description" content="Italian acetate, titanium, polarised lenses. Made in small runs, shipped across Europe.">
-  <meta property="og:url" content="https://elensunglasses.com/">
-  <meta property="og:image" content="https://elensunglasses.com/images/og-image.png">
+  <meta property="og:title" content="Elen Sunglasses — Ochelari de soare de lux">
+  <meta property="og:description" content="Acetat italian, titan, lentile polarizate. Livrare gratuită în toată România.">
+  <meta property="og:url" content="https://elensunglasses.ro/">
+  <meta property="og:image" content="https://elensunglasses.ro/images/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="en_GB">
+  <meta property="og:locale" content="ro_RO">
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 
-  <!-- ===== Google Fonts: Cormorant Garamond (headings) + Inter (body) ===== -->
+  <!-- ===== Google Fonts: Cormorant Garamond (titluri) + Inter (text) ===== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Tells the CSS that JavaScript is running, so scroll animations can be enabled. -->
+  <!-- Spune CSS-ului că JavaScript rulează, ca animațiile la scroll să pornească. -->
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">Sari la conținut</a>
 
-  <!-- ================= HEADER ================= -->
+  <!-- ================= ANTET ================= -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#top" class="logo" aria-label="Elen Sunglasses, back to top">Elen</a>
-      <nav class="main-nav" aria-label="Main">
-        <a href="#shop">Shop</a>
-        <a href="#about">About</a>
-        <button class="bag-button" type="button" id="bag-open" aria-label="Open shopping bag">
-          Bag <span class="bag-count" id="bag-count">0</span>
+      <a href="#top" class="logo" aria-label="Elen Sunglasses, înapoi sus">Elen</a>
+      <nav class="main-nav" aria-label="Meniu principal">
+        <a href="#magazin">Magazin</a>
+        <a href="cum-le-facem.html">Cum le facem</a>
+        <button class="bag-button" type="button" id="bag-open" aria-label="Deschide coșul">
+          Coș <span class="bag-count" id="bag-count">0</span>
         </button>
       </nav>
     </div>
@@ -55,116 +55,173 @@
   <main id="main">
 
     <!-- ================= 1. HERO =================
-         The picture behind the text. If the photo can't load, onerror swaps
-         in a local placeholder so the page never shows a broken image. -->
+         Pune poza ta în images/hero.jpg (lată, cel puțin 2000 px).
+         Până atunci se vede desenul din images/hero.svg. -->
     <section class="hero" id="top">
-      <img class="hero-bg"
-           src="https://unsplash.com/photos/zy0P4vq4xw0/download?w=2000"
-           alt="" width="2000" height="1333" fetchpriority="high"
+      <img class="hero-bg" src="images/hero.jpg" alt="" width="2000" height="1333" fetchpriority="high"
            onerror="this.onerror=null;this.src='images/hero.svg'">
       <div class="container hero-inner">
-        <p class="eyebrow">Summer collection · Eight frames</p>
+        <p class="eyebrow">Colecția de vară · Nouă rame</p>
         <h1 class="hero-title">Elen</h1>
         <p class="hero-lead">
-          Sunglasses made the slow way, in Italian acetate and titanium. Small runs, no logos on the arms.
+          Ochelari de soare din acetat italian și titan, făcuți în serii mici. Fără logo pe brațe.
         </p>
-        <a href="#shop" class="btn btn-light">Shop the collection</a>
+        <a href="#magazin" class="btn btn-light">Vezi colecția</a>
       </div>
     </section>
 
-    <!-- ================= 2. PROMISES STRIP =================
-         [EDIT ME] Make sure these match your real shipping and returns policy. -->
-    <section class="promises" aria-label="Shipping and returns">
+    <!-- ================= 2. PROMISIUNI =================
+         [EDIT ME] Verifică să corespundă cu politica ta reală de livrare și retur. -->
+    <section class="promises" aria-label="Livrare și plată">
       <ul class="container promises-list">
-        <li>Free shipping across the EU</li>
-        <li>30-day returns</li>
-        <li>2-year warranty</li>
+        <li>Livrare gratuită în toată România, în 24–48 h</li>
+        <li>Plată cu cardul sau ramburs</li>
+        <li>Retur gratuit în 30 de zile</li>
+        <li>Garanție 2 ani</li>
       </ul>
     </section>
 
-    <!-- ================= 3. SHOP =================
-         The product cards are created by script.js from products.js.
-         To add or change a product, edit products.js — not this file. -->
-    <section class="shop section" id="shop">
+    <!-- Apare doar pentru abonații care au intrat pe site cu linkul de acces anticipat -->
+    <div class="early-banner" id="early-banner" hidden>
+      <p class="container">Ai acces anticipat. Poți cumpăra modelele noi înainte de lansarea publică.</p>
+    </div>
+
+    <!-- ================= 3. MAGAZIN =================
+         Cardurile de produs sunt create de script.js din products.js.
+         Ca să adaugi sau să modifici un produs, editează products.js, nu acest fișier. -->
+    <section class="shop section" id="magazin">
       <div class="container">
         <div class="shop-head fade-in">
           <div>
-            <p class="eyebrow">The collection</p>
-            <h2 class="section-title">Shop sunglasses</h2>
+            <p class="eyebrow">Colecția</p>
+            <h2 class="section-title">Ochelari de soare</h2>
           </div>
 
           <div class="shop-controls">
-            <!-- Filter buttons (by frame material) -->
-            <div class="filters" role="group" aria-label="Filter by material">
-              <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">All</button>
-              <button type="button" class="filter" data-filter="acetate" aria-pressed="false">Acetate</button>
+            <div class="filters" role="group" aria-label="Filtrează după material">
+              <button type="button" class="filter is-active" data-filter="toate" aria-pressed="true">Toate</button>
+              <button type="button" class="filter" data-filter="acetat" aria-pressed="false">Acetat</button>
               <button type="button" class="filter" data-filter="metal" aria-pressed="false">Metal</button>
-              <button type="button" class="filter" data-filter="mixed" aria-pressed="false">Browline</button>
+              <button type="button" class="filter" data-filter="mixt" aria-pressed="false">Browline</button>
             </div>
 
-            <label class="sort">
-              <span class="visually-hidden">Sort by</span>
-              <select id="sort">
-                <option value="featured">Featured</option>
-                <option value="price-asc">Price: low to high</option>
-                <option value="price-desc">Price: high to low</option>
-              </select>
-            </label>
+            <div class="selects">
+              <label class="select">
+                <span class="visually-hidden">Mărime</span>
+                <select id="size-filter">
+                  <option value="toate">Toate mărimile</option>
+                  <option value="mică">Mărime mică</option>
+                  <option value="medie">Mărime medie</option>
+                  <option value="mare">Mărime mare</option>
+                </select>
+              </label>
+              <label class="select">
+                <span class="visually-hidden">Sortează</span>
+                <select id="sort">
+                  <option value="recomandate">Recomandate</option>
+                  <option value="pret-cresc">Preț crescător</option>
+                  <option value="pret-descr">Preț descrescător</option>
+                </select>
+              </label>
+            </div>
           </div>
         </div>
 
         <ul class="product-grid" id="product-grid">
-          <!-- Filled in by script.js -->
+          <!-- Completat de script.js -->
         </ul>
+        <p class="no-results" id="no-results" hidden>Niciun model nu se potrivește filtrelor alese.</p>
 
-        <noscript>
-          <p>Please turn on JavaScript to browse the collection.</p>
-        </noscript>
+        <noscript><p>Activează JavaScript ca să vezi colecția.</p></noscript>
 
-        <p class="vat-note">All prices in euros, including VAT.</p>
+        <p class="vat-note">Prețuri în lei, cu TVA inclus. <a href="#ghid-marimi">Nu știi ce mărime porți?</a></p>
       </div>
     </section>
 
-    <!-- ================= 4. ABOUT / BRAND STORY ================= -->
-    <section class="about section" id="about">
+    <!-- ================= 4. GHID DE MĂRIMI ================= -->
+    <section class="size-guide section" id="ghid-marimi">
+      <div class="container size-guide-inner">
+        <div class="fade-in">
+          <p class="eyebrow">Ghid de mărimi</p>
+          <h2 class="section-title">Cum îți alegi mărimea</h2>
+          <p>
+            Cel mai simplu: ia o pereche de ochelari care îți stă bine și uită-te pe interiorul brațului.
+            Acolo sunt trei numere, de exemplu <strong>52□20-145</strong>: lățimea lentilei, puntea și lungimea brațului, toate în milimetri.
+          </p>
+          <p>
+            Compară-le cu dimensiunile fiecărui model (le găsești când dai click pe produs).
+            O diferență de 1–2 mm la lentilă nu se simte. Peste 4 mm, rama va părea vizibil mai mare sau mai mică.
+          </p>
+          <ul class="size-legend">
+            <li><strong>Mică</strong>: lățime totală sub 137 mm. Fețe înguste.</li>
+            <li><strong>Medie</strong>: 137–145 mm. Se potrivește celor mai mulți.</li>
+            <li><strong>Mare</strong>: peste 145 mm. Fețe late sau dacă îți plac ramele mari.</li>
+          </ul>
+          <p class="size-help">Tot nu ești sigur? Scrie-ne la <a href="mailto:salut@example.com">salut@example.com</a> cu dimensiunile perechii tale și îți spunem noi.</p>
+        </div>
+
+        <!-- Desen simplu cu ce înseamnă fiecare măsură -->
+        <figure class="size-diagram fade-in" aria-label="Unde se măsoară lentila, puntea, înălțimea și brațul">
+          <svg viewBox="0 0 420 260" role="img">
+            <title>Diagrama măsurilor unei rame</title>
+            <g fill="none" stroke="currentColor" stroke-width="3">
+              <rect x="40" y="60" width="140" height="100" rx="30"/>
+              <rect x="220" y="60" width="140" height="100" rx="30"/>
+              <path d="M180 85 Q200 70 220 85"/>
+            </g>
+            <g stroke="var(--color-accent)" stroke-width="1.5" fill="var(--color-accent)" font-family="Inter, sans-serif" font-size="13">
+              <line x1="40" y1="40" x2="180" y2="40"/><text x="110" y="32" text-anchor="middle" stroke="none">A · lentilă</text>
+              <line x1="180" y1="185" x2="220" y2="185"/><text x="200" y="205" text-anchor="middle" stroke="none">B · punte</text>
+              <line x1="380" y1="60" x2="380" y2="160"/><text x="398" y="110" text-anchor="middle" stroke="none" transform="rotate(90 398 110)">C · înălțime</text>
+              <line x1="20" y1="235" x2="380" y2="235"/><text x="200" y="252" text-anchor="middle" stroke="none">lățime totală</text>
+            </g>
+          </svg>
+          <figcaption>Pe braț scrie A□B-lungime braț, în milimetri.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ================= 5. DESPRE ================= -->
+    <section class="about section" id="despre">
       <div class="container about-inner">
         <figure class="about-media fade-in">
-          <img src="https://unsplash.com/photos/aI36oYho6Mg/download?w=1200"
-               alt="Woman in a black top wearing sunglasses"
+          <!-- Pune poza ta în images/despre.jpg (verticală, 4:5) -->
+          <img src="images/despre.jpg" alt="Ochelari Elen purtați la soare"
                width="800" height="1000" loading="lazy" decoding="async"
                onerror="this.onerror=null;this.src='images/about.svg'">
         </figure>
 
         <div class="about-text fade-in">
-          <p class="eyebrow">About</p>
-          <h2 class="section-title">Why we started Elen</h2>
-          <!-- [EDIT ME] Replace both paragraphs below with your own story. -->
+          <p class="eyebrow">Despre</p>
+          <h2 class="section-title">De ce am pornit Elen</h2>
+          <!-- [EDIT ME] Înlocuiește cele două paragrafe cu povestea ta. -->
           <p>
-            [EDIT ME] Most luxury sunglasses are made in the same few factories as everyone else's,
-            then sold on the strength of a logo. We wanted to pay for the frame instead. Elen pairs
-            are cut from Italian acetate, polished by hand and fitted with polarised lenses.
+            [EDIT ME] Multe branduri de lux își fac ochelarii în aceleași fabrici ca toată lumea,
+            apoi îi vând pe baza logoului. Noi am vrut să plătim pentru ramă. Ochelarii Elen sunt
+            tăiați din acetat italian, lustruiți manual și au lentile polarizate.
           </p>
           <p>
-            [EDIT ME] We make each frame in runs of a few hundred. When a colour sells out, it may
-            come back next season, or it may not. That's the deal with doing it this way.
+            [EDIT ME] Fiecare model îl facem în câteva sute de bucăți. Când o culoare se termină,
+            poate revine sezonul următor, poate nu. Așa merge când lucrezi în felul ăsta.
           </p>
+          <a href="cum-le-facem.html" class="text-link">Vezi cum le facem →</a>
         </div>
       </div>
     </section>
 
-    <!-- ================= 5. NEWSLETTER FORM ================= -->
-    <section class="notify section" id="notify">
+    <!-- ================= 6. ABONARE ================= -->
+    <section class="notify section" id="abonare">
       <div class="container notify-inner fade-in">
-        <p class="eyebrow">The list</p>
-        <h2 class="section-title">Hear about new frames first</h2>
+        <p class="eyebrow">Lista Elen</p>
+        <h2 class="section-title">Cumperi modelele noi înaintea tuturor</h2>
         <p class="section-intro">
-          We email when a new frame or colour comes out, a few times a year. Subscribers get first access
-          before small runs sell out.
+          Scriem când apare o ramă sau o culoare nouă, de câteva ori pe an. Abonații primesc un link
+          de acces anticipat și pot cumpăra înainte de lansarea publică, cât timp seriile mici încă nu s-au terminat.
         </p>
 
         <form class="notify-form" id="notify-form" novalidate>
           <div class="field">
-            <label for="name">Name <span class="optional">(optional)</span></label>
+            <label for="name">Prenume <span class="optional">(opțional)</span></label>
             <input type="text" id="name" name="name" autocomplete="given-name">
           </div>
 
@@ -178,99 +235,185 @@
           <div class="field field-checkbox">
             <input type="checkbox" id="consent" name="consent" required aria-describedby="consent-error">
             <label for="consent">
-              I agree to receive emails from Elen Sunglasses. I can unsubscribe at any time.
+              Sunt de acord să primesc emailuri de la Elen Sunglasses. Mă pot dezabona oricând.
             </label>
             <p class="field-error" id="consent-error" aria-live="polite"></p>
           </div>
 
-          <button type="submit" class="btn btn-primary">Sign up</button>
+          <button type="submit" class="btn btn-primary">Mă abonez</button>
         </form>
 
         <div class="form-success" id="form-success" hidden tabindex="-1">
-          <h3>Thanks, you're on the list.</h3>
-          <p>We'll write when there's something new. Not before.</p>
+          <h3>Mulțumim, ești pe listă.</h3>
+          <p>Îți scriem când apare ceva nou, cu linkul de acces anticipat.</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ================= FOOTER ================= -->
+  <!-- ================= SUBSOL ================= -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
         <p class="logo">Elen</p>
-        <p class="footer-small">Luxury sunglasses, designed in Europe.</p>
+        <p class="footer-small">Ochelari de soare de lux, gândiți în Europa.</p>
       </div>
 
       <ul class="footer-links">
-        <!-- Replace with your Instagram URL and contact email -->
+        <!-- Înlocuiește cu linkul tău de Instagram și adresa de email -->
         <li><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
-        <li><a href="mailto:hello@example.com">hello@example.com</a></li>
+        <li><a href="mailto:salut@example.com">salut@example.com</a></li>
+        <li><a href="cum-le-facem.html">Cum le facem</a></li>
+        <li><a href="#ghid-marimi">Ghid de mărimi</a></li>
       </ul>
 
-      <!-- EU online shops need these pages. Point each link to your own page. -->
+      <!-- Paginile obligatorii pentru un magazin online din România. Leagă fiecare link de pagina ta. -->
       <ul class="footer-links footer-legal">
-        <li><a href="#">Shipping &amp; returns</a></li>
-        <li><a href="#">Terms of sale</a></li>
-        <li><a href="#">Privacy policy</a></li>
-        <li><a href="#">Legal notice</a></li>
+        <li><a href="#">Termeni și condiții</a></li>
+        <li><a href="#">Livrare și retur</a></li>
+        <li><a href="#">Politica de confidențialitate</a></li>
+        <li><a href="https://anpc.ro/" target="_blank" rel="noopener">ANPC</a></li>
+        <li><a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="noopener">Soluționarea alternativă a litigiilor (SAL)</a></li>
       </ul>
 
       <p class="footer-gdpr">
-        We use your email only to send you Elen news, and your order details only to deliver your order.
-        We don't sell or share your data. Write to us any time and we'll delete it.
-        The shopping bag is saved in your browser; we don't use tracking cookies.
+        Folosim emailul tău doar ca să-ți trimitem noutăți Elen, iar datele de comandă doar ca să livrăm comanda.
+        Nu vindem și nu dăm datele mai departe. Scrie-ne oricând și le ștergem.
+        Coșul e salvat în browserul tău; nu folosim cookie-uri de urmărire.
       </p>
 
-      <!-- Photo credits: remove once you use your own photos -->
-      <p class="footer-small">Placeholder photos from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.</p>
-
+      <!-- [EDIT ME] Datele firmei sunt obligatorii pe un magazin online -->
+      <p class="footer-small">Elen Sunglasses SRL · CUI [EDIT ME] · Nr. Reg. Com. [EDIT ME] · Adresă [EDIT ME]</p>
       <p class="footer-small">© <span id="year">2026</span> Elen Sunglasses</p>
     </div>
   </footer>
 
-  <!-- ================= PRODUCT QUICK VIEW =================
-       A native <dialog>. script.js fills it in when a product is clicked. -->
+  <!-- ================= FEREASTRA PRODUSULUI =================
+       Un <dialog> nativ. script.js îl completează când se dă click pe un produs. -->
   <dialog class="quickview" id="quickview" aria-labelledby="qv-name">
-    <button class="dialog-close" type="button" aria-label="Close">&times;</button>
+    <button class="dialog-close" type="button" aria-label="Închide">&times;</button>
     <div class="quickview-inner">
       <div class="quickview-media">
         <img src="" alt="" id="qv-img">
+        <div class="qv-thumbs" id="qv-thumbs"></div>
       </div>
       <div class="quickview-text">
         <p class="eyebrow" id="qv-colour"></p>
         <h2 class="qv-name" id="qv-name"></h2>
         <p class="qv-price" id="qv-price"></p>
+        <p class="stock" id="qv-stock"></p>
         <p id="qv-desc"></p>
+
+        <h3 class="qv-subtitle">Dimensiuni</h3>
+        <p class="qv-size-code" id="qv-size-code"></p>
+        <table class="size-table">
+          <tbody id="qv-size"></tbody>
+        </table>
+        <p class="qv-size-link"><a href="#ghid-marimi" id="qv-guide-link">Cum îți alegi mărimea</a></p>
+
+        <h3 class="qv-subtitle">Detalii</h3>
         <ul class="qv-details" id="qv-details"></ul>
-        <button type="button" class="btn btn-primary" id="qv-add">Add to bag</button>
+        <button type="button" class="btn btn-primary" id="qv-add">Adaugă în coș</button>
       </div>
     </div>
   </dialog>
 
-  <!-- ================= SHOPPING BAG (slides in from the right) ================= -->
+  <!-- ================= COȘUL (vine din dreapta) ================= -->
   <dialog class="bag" id="bag" aria-labelledby="bag-title">
     <div class="bag-head">
-      <h2 id="bag-title">Your bag</h2>
-      <button class="dialog-close" type="button" aria-label="Close bag">&times;</button>
+      <h2 id="bag-title">Coșul tău</h2>
+      <button class="dialog-close" type="button" aria-label="Închide coșul">&times;</button>
     </div>
 
     <ul class="bag-items" id="bag-items"></ul>
-    <p class="bag-empty" id="bag-empty">Your bag is empty.</p>
+    <p class="bag-empty" id="bag-empty">Coșul e gol.</p>
 
     <div class="bag-foot" id="bag-foot">
-      <p class="bag-total"><span>Subtotal</span> <span id="bag-subtotal">€0</span></p>
-      <p class="bag-small">Including VAT. Shipping is free within the EU.</p>
-      <button type="button" class="btn btn-primary btn-block" id="checkout-button">Checkout</button>
+      <p class="bag-total"><span>Subtotal</span> <span id="bag-subtotal">0 lei</span></p>
+      <p class="bag-small">TVA inclus. Livrare gratuită în toată România, în 24–48 h.</p>
+
+      <!-- Metodele de plată. Le pornești și oprești din script.js (secțiunea SETĂRI PLATĂ). -->
+      <fieldset class="pay-methods" id="pay-methods">
+        <legend>Cum plătești?</legend>
+        <label class="pay-option" id="pay-card">
+          <input type="radio" name="plata" value="card" checked>
+          <span><strong>Card</strong> <small>Visa, Mastercard, Apple Pay, Google Pay</small></span>
+        </label>
+        <label class="pay-option" id="pay-ramburs">
+          <input type="radio" name="plata" value="ramburs">
+          <span><strong>Ramburs</strong> <small>Plătești curierului, la livrare</small></span>
+        </label>
+      </fieldset>
+
+      <button type="button" class="btn btn-primary btn-block" id="checkout-button">Finalizează comanda</button>
       <p class="bag-message" id="bag-message" aria-live="polite"></p>
     </div>
   </dialog>
 
-  <!-- Small pop-up message ("Added to bag") -->
+  <!-- ================= COMANDĂ CU PLATA RAMBURS ================= -->
+  <dialog class="cod" id="cod" aria-labelledby="cod-title">
+    <button class="dialog-close" type="button" aria-label="Închide">&times;</button>
+    <div class="cod-inner">
+      <h2 id="cod-title">Date de livrare</h2>
+      <p class="cod-summary" id="cod-summary"></p>
+
+      <form id="cod-form" novalidate>
+        <div class="field">
+          <label for="cod-nume">Nume și prenume</label>
+          <input type="text" id="cod-nume" name="nume" autocomplete="name" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="cod-telefon">Telefon</label>
+            <input type="tel" id="cod-telefon" name="telefon" autocomplete="tel" inputmode="tel" placeholder="07xx xxx xxx" required>
+          </div>
+          <div class="field">
+            <label for="cod-email">Email</label>
+            <input type="email" id="cod-email" name="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="cod-judet">Județ</label>
+            <select id="cod-judet" name="judet" autocomplete="address-level1" required>
+              <option value="">Alege județul</option>
+              <!-- Lista e completată de script.js -->
+            </select>
+          </div>
+          <div class="field">
+            <label for="cod-localitate">Localitate</label>
+            <input type="text" id="cod-localitate" name="localitate" autocomplete="address-level2" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="cod-adresa">Adresă</label>
+          <input type="text" id="cod-adresa" name="adresa" autocomplete="street-address" placeholder="Strada, număr, bloc, apartament" required>
+        </div>
+        <div class="field">
+          <label for="cod-postal">Cod poștal <span class="optional">(opțional)</span></label>
+          <input type="text" id="cod-postal" name="cod_postal" autocomplete="postal-code" inputmode="numeric">
+        </div>
+        <div class="field field-checkbox">
+          <input type="checkbox" id="cod-termeni" name="termeni" required>
+          <label for="cod-termeni">Am citit și accept <a href="#">termenii și condițiile</a>.</label>
+        </div>
+        <p class="field-error" id="cod-error" aria-live="polite"></p>
+        <button type="submit" class="btn btn-primary btn-block" id="cod-submit">Trimite comanda</button>
+        <p class="bag-small">Te sunăm să confirmăm comanda înainte s-o predăm curierului.</p>
+      </form>
+
+      <div class="form-success" id="cod-success" hidden tabindex="-1">
+        <h3>Am primit comanda.</h3>
+        <p id="cod-success-text">Te sunăm în cel mult o zi lucrătoare să o confirmăm.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Mesaj scurt jos pe ecran („Adăugat în coș”) -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- products.js must load before script.js -->
+  <!-- products.js trebuie încărcat înainte de script.js -->
   <script src="products.js" defer></script>
   <script src="script.js" defer></script>
 </body>

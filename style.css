@@ -278,7 +278,7 @@ button { font: inherit; color: inherit; }
 .filter:hover { border-color: var(--color-text); }
 .filter.is-active { background: var(--color-text); border-color: var(--color-text); color: var(--color-bg); }
 
-.sort select {
+.select select {
   font: inherit;
   font-size: 0.85rem;
   padding: 0.5rem 2rem 0.5rem 0.75rem;
@@ -484,7 +484,9 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
 .optional { color: var(--color-muted); font-weight: 400; }
 
 .field input[type="text"],
-.field input[type="email"] {
+.field input[type="email"],
+.field input[type="tel"],
+.field select {
   width: 100%;
   font: inherit;
   font-size: 1rem;          /* 16px stops iPhones zooming in on focus */
@@ -555,7 +557,7 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
   html { scroll-behavior: auto; }
   .js .fade-in { opacity: 1; transform: none; transition: none; }
   .product-media img, .toast { transition: none; }
-  .quickview[open], .bag[open] { animation: none; }
+  .quickview[open], .bag[open], .cod[open] { animation: none; }
 }
 
 /* =========================================================
@@ -588,4 +590,140 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
 
   .quickview-inner { display: grid; grid-template-columns: 1fr 1fr; }
   .quickview-text { padding: 3.5rem 3rem; align-self: center; }
+}
+
+/* =========================================================
+   Elemente adăugate pentru magazinul din România
+   ========================================================= */
+
+/* ---------- 14. Stoc, etichete, filtre ---------- */
+.selects { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.product-media { position: relative; }
+.product-tag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+}
+.product-card.is-unavailable .product-media img { opacity: 0.6; }
+
+.nowrap { white-space: nowrap; }
+.product-meta { font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; }
+
+.stock { font-size: 0.8rem; margin: 0.15rem 0 0; color: var(--color-muted); }
+.stock.is-low { color: var(--color-accent); font-weight: 500; }
+
+.no-results { color: var(--color-muted); }
+
+.early-banner { background: var(--color-text); color: var(--color-bg); font-size: 0.875rem; }
+.early-banner p { margin: 0; padding-top: 0.75rem; padding-bottom: 0.75rem; text-align: center; }
+
+.text-link { color: var(--color-accent); text-decoration: none; font-weight: 500; }
+.text-link:hover { text-decoration: underline; }
+.vat-note a { color: var(--color-text); }
+
+/* ---------- 15. Ghid de mărimi ---------- */
+.size-guide { border-top: 1px solid var(--color-line); }
+.size-guide-inner { display: grid; gap: 2.5rem; }
+.size-guide p { max-width: 36rem; }
+.size-legend { display: grid; gap: 0.4rem; margin: 1.5rem 0; }
+.size-legend li { padding-left: 1rem; border-left: 2px solid var(--color-beige); }
+.size-help { color: var(--color-muted); font-size: 0.9rem; }
+
+.size-diagram { background: var(--color-beige); padding: 2rem 1.5rem 1.5rem; color: var(--color-text); }
+.size-diagram svg { width: 100%; height: auto; }
+.size-diagram figcaption { font-size: 0.85rem; color: var(--color-muted); text-align: center; margin-top: 0.75rem; }
+
+/* În fereastra produsului */
+.qv-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 1.75rem 0 0.6rem;
+}
+.qv-size-code { font-size: 0.9rem; margin-bottom: 0.5rem; }
+.size-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.size-table th, .size-table td { padding: 0.45rem 0; border-bottom: 1px solid var(--color-line); }
+.size-table th { text-align: left; font-weight: 400; color: var(--color-muted); }
+.size-table td { text-align: right; font-weight: 500; }
+.qv-size-link { font-size: 0.85rem; margin: 0.6rem 0 0; }
+.qv-size-link a { color: var(--color-accent); }
+
+.qv-thumbs { display: flex; gap: 0.5rem; padding: 0.5rem; background: var(--color-bg); }
+.qv-thumbs button { padding: 0; border: 1px solid transparent; background: var(--color-beige); cursor: pointer; width: 64px; }
+.qv-thumbs button.is-active { border-color: var(--color-text); }
+.qv-thumbs img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.qv-thumbs:empty { display: none; }
+.quickview .btn:disabled { cursor: not-allowed; }
+
+/* ---------- 16. Metode de plată și comanda ramburs ---------- */
+.pay-methods { border: 0; padding: 0; margin: 1rem 0; display: grid; gap: 0.5rem; }
+.pay-methods legend { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; }
+.pay-option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-line);
+  cursor: pointer;
+}
+.pay-option:has(input:checked) { border-color: var(--color-text); }
+.pay-option input { margin-top: 0.3rem; accent-color: var(--color-accent); }
+.pay-option small { display: block; color: var(--color-muted); font-size: 0.8rem; }
+.pay-option[hidden], .pay-methods[hidden] { display: none; }
+
+.cod {
+  width: min(100% - 2rem, 560px);
+  max-height: calc(100% - 2rem);
+  padding: 0;
+  border: 0;
+  background: var(--color-bg);
+}
+.cod[open] { animation: fade-in 0.25s ease; }
+.cod .dialog-close { position: absolute; top: 0.5rem; right: 0.5rem; }
+.cod-inner { padding: 2rem 1.5rem; }
+.cod-inner h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+.cod-summary { color: var(--color-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.cod .field { margin-bottom: 1rem; }
+.cod .field-error { margin-bottom: 1rem; }
+.field-row { display: grid; gap: 0 1rem; }
+
+/* ---------- 17. Pagina „Cum le facem” ---------- */
+.page-hero { min-height: min(70vh, 620px); }
+.steps { display: grid; gap: 4rem; counter-reset: pas; list-style: none; margin: 0; padding: 0; }
+.step { display: grid; gap: 1.5rem; }
+.step-media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--color-beige); }
+.step-text h2 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin-bottom: 0.75rem; }
+.step-text h2::before {
+  counter-increment: pas;
+  content: counter(pas, decimal-leading-zero);
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  color: var(--color-accent);
+  margin-bottom: 0.75rem;
+}
+.step-text p { max-width: 34rem; }
+.page-cta { text-align: center; }
+.page-cta .section-intro { margin: 0 auto 2rem; }
+
+@media (min-width: 600px) {
+  .field-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 900px) {
+  .size-guide-inner { grid-template-columns: 1.1fr 0.9fr; gap: 5rem; align-items: center; }
+  .step { grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .step:nth-child(even) .step-media { order: 2; }
+  .cod-inner { padding: 2.5rem; }
 }
