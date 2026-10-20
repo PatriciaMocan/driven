@@ -1,0 +1,14 @@
+{
+  "name": "elen-agent-magazine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agent care caută magazinele unde se pot lista ochelarii Elen, pornind de la ICP-uri",
+  "type": "module",
+  "scripts": {
+    "magazine": "node magazine.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "zod": "^4.6.7"
+  }
+}

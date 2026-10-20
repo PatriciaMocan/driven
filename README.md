@@ -12,6 +12,7 @@ api/checkout.js     plata prin Stripe (integral sau avans)
 api/rezervari.js    contorul de rezervări, numărat din plățile Stripe
 api/_stripe.js      cod comun pentru cele două de mai sus
 images/             pozele tale + desenele folosite până le urci
+agent/              agentul care caută magazine unde să-ți listezi ochelarii (nu se publică pe site)
 ```
 
 ## Înainte de prima comandă reală
@@ -133,3 +134,28 @@ Arată mesajul de mulțumire, dar nu salvează încă adresele. În `script.js`,
 - **Texte:** în `index.html` și `cum-le-facem.html`. Fiecare secțiune începe cu un comentariu de forma `<!-- ===== 5. DESPRE ===== -->`. Povestea brandului e marcată cu `[EDIT ME]`.
 - **Culori și fonturi:** blocul `:root` din începutul `style.css`. Culoarea de accent e `--color-accent`.
 - **Domeniul:** înlocuiește `https://elensunglasses.ro` din etichetele `og:` ale ambelor pagini cu domeniul tău real.
+
+## Agentul care caută magazine
+
+În `agent/` e un agent care pornește de la clienții tăi ideali (ICP) și caută pe internet magazinele unde ți-ai putea vinde ochelarii: concept store-uri, optici independente, magazine de menswear, buticuri de hotel și resort, site-uri curatoriate. Folosește Claude cu căutare pe web și verifică fiecare magazin pe site-ul lui.
+
+1. Scrie ICP-urile tale în `agent/icp.js`. Cele de acum sunt un punct de plecare, scrise după site. Tot acolo, în `EXCLUSE`, pui magazinele pe care le știi deja, ca să nu ți le mai propună.
+2. Ia o cheie de la [platform.claude.com](https://platform.claude.com/settings/keys).
+3. Din folderul `agent/`:
+
+```bash
+npm install
+export ANTHROPIC_API_KEY=sk-ant-...
+node magazine.js                      # toate ICP-urile
+node magazine.js --icp optica         # doar un ICP
+node magazine.js --oras Cluj-Napoca   # doar un oraș
+node magazine.js --max 10             # câte magazine pe ICP (implicit 15)
+```
+
+Durează câteva minute pe ICP. Rezultatul ajunge în `agent/rezultate/`, în trei forme: `.csv` (se deschide în Excel), `.md` (de citit) și `.json`. Pentru fiecare magazin ai: scor de potrivire 1–10, pentru ce ICP-uri e bun, ce mărci similare vinde și la ce prețuri, dacă vinde deja ochelari, cum lucrează probabil (consignație, en-gros, marketplace), contactul public, riscurile, primul pas și linkul unde s-a verificat. Un magazin bun pentru mai multe ICP-uri apare o singură dată.
+
+Agentul citește prețurile și modelele din `products.js`, deci le folosește pe cele actuale.
+
+Verifică tu contactele înainte să scrii cuiva. Agentul nu inventează date în mod intenționat, dar site-urile se schimbă și pot rămâne informații vechi.
+
+Fiecare rulare costă bani pe contul Anthropic (căutări pe web plus model), de obicei câțiva dolari pentru toate cele patru ICP-uri. Folderul `agent/` nu se publică pe Vercel (vezi `.vercelignore`).
