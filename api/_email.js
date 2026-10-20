@@ -10,7 +10,7 @@
    ========================================================= */
 
 const crypto = require('crypto');
-const { AGENT } = require('../agent.js');
+const { AGENT } = require('../agent-vanzari.js');
 
 function siteUrl() {
   const url = process.env.SITE_URL ||
@@ -130,7 +130,7 @@ const MOTIVE = {
   abonat: 'Primești emailul pentru că te-ai abonat la Lista Elen.'
 };
 
-/* continut: ce întoarce o funcție din TEXTE (agent.js)
+/* continut: ce întoarce o funcție din TEXTE (agent-vanzari.js)
    destinatar: { email, motiv: 'cos' | 'client' | 'abonat' } */
 async function randeaza(continut, destinatar) {
   const site = siteUrl();

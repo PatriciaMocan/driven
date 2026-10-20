@@ -5,15 +5,15 @@
    La fiecare rulare:
      1. Citește din Stripe plățile noi și le salvează ca clienți.
         Cine a plătit nu mai primește emailuri despre coșul abandonat.
-     2. Coșuri abandonate: emailul 1, 2 sau 3, după orele din agent.js.
+     2. Coșuri abandonate: emailul 1, 2 sau 3, după orele din agent-vanzari.js.
      3. Recenzii: la câteva zile după livrare.
      4. Lansări: modelele noi din products.js, către clienți și abonați.
      5. Recomandări: o a doua pereche, la o lună și ceva după livrare.
    Fiecare om primește cel mult un email pe rulare, iar cine s-a dezabonat, niciunul.
-   Textele și orele se schimbă în agent.js, nu aici.
+   Textele și orele se schimbă în agent-vanzari.js, nu aici.
    ========================================================= */
 
-const { AGENT, TEXTE, recomanda, poateFiPrecomandat, lista, PRODUCTS, PRECOMANDA } = require('../agent.js');
+const { AGENT, TEXTE, recomanda, poateFiPrecomandat, lista, PRODUCTS, PRECOMANDA } = require('../agent-vanzari.js');
 const { locuriLibere, etapaLansare, marimeRama } = require('../products.js');
 const { stripe, numaraRezervari } = require('./_stripe.js');
 const { db } = require('./_db.js');

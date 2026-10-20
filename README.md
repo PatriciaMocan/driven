@@ -14,7 +14,7 @@ api/rezervari.js    contorul de rezervări, numărat din plățile Stripe
 api/_stripe.js      cod comun pentru cele două de mai sus
 images/             pozele tale + desenele folosite până le urci
 
-agent.js            AGENTUL DE VÂNZĂRI: setări și textele emailurilor
+agent-vanzari.js    AGENTUL DE VÂNZĂRI: setări și textele emailurilor
 api/_agent.js       ce face agentul la fiecare rulare (nu trebuie atins)
 api/agent.js        pornirea agentului (o apelează Vercel Cron și GitHub Actions)
 api/cos.js          coșul lăsat pe email
@@ -162,7 +162,7 @@ Reguli pe care agentul le respectă singur:
 - **Fiecare email are link de dezabonare** (și butonul „Dezabonează-te” din Gmail). Cine se dezabonează nu mai primește nimic.
 - **Nu cere recenzii înainte de livrare.** Când trimiți prima serie, completează `PRECOMANDA.livrataPe` în `products.js` (de exemplu `'2027-03-10'`).
 
-Orele, zilele și textele emailurilor se schimbă în `agent.js`. În `admin.html` vezi cum arată fiecare email înainte să-l trimită cineva.
+Orele, zilele și textele emailurilor se schimbă în `agent-vanzari.js`. În `admin.html` vezi cum arată fiecare email înainte să-l trimită cineva.
 
 ### Pornește agentul
 
@@ -208,8 +208,8 @@ Pozele aprobate le poți folosi și pe Instagram sau ca poza a treia a produsulu
 
 ### Înainte să-l pornești
 
-- [ ] Textul despre anulare și retur din emailul 3 (în `agent.js`) e același cu cel din „Cum funcționează” pe site.
-- [ ] `semnatura` și `firma` din `agent.js` completate (un nume de om la semnătură e citit mai des).
+- [ ] Textul despre anulare și retur din emailul 3 (în `agent-vanzari.js`) e același cu cel din „Cum funcționează” pe site.
+- [ ] `semnatura` și `firma` din `agent-vanzari.js` completate (un nume de om la semnătură e citit mai des).
 - [ ] În politica de confidențialitate: coșul păstrat pe email (cel mult 14 zile), emailurile despre modele noi către clienți și abonați, recenziile și pozele publicate cu acord, Resend și Upstash ca furnizori.
 - [ ] Emailurile către clienții vechi se bazează pe faptul că au cumpărat de la tine și au fost anunțați la plată (pe pagina Stripe scrie „Îți putem scrie despre modelele noi Elen; te poți dezabona din orice email”). Verifică cu avocatul că așa e în regulă pentru tine.
 

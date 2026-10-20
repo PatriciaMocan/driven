@@ -1,6 +1,6 @@
 /* =========================================================
    GET /api/agent
-   Pornește agentul de vânzări (vezi api/_agent.js și agent.js).
+   Pornește agentul de vânzări (vezi api/_agent.js și agent-vanzari.js).
    Îl apelează singur Vercel Cron (vercel.json) și GitHub Actions
    (.github/workflows/agent-vanzari.yml), cu antetul
      Authorization: Bearer <CRON_SECRET>
