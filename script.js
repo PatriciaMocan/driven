@@ -86,6 +86,25 @@ function scrieLocal(cheie, valoare) {
   try { localStorage.setItem(cheie, valoare); } catch (e) { /* ignorăm */ }
 }
 
+// Analytics (analytics.js). Nu trimite nimic fără acordul vizitatorului.
+function track(eveniment, date) {
+  if (window.Elen && window.Elen.track) window.Elen.track(eveniment, date);
+}
+
+// Produsele în formatul de e-commerce GA4, cu valoarea totală în lei
+function dateProduse(lista) {
+  const items = lista.map(({ p, qty }) => ({
+    item_id: p.id,
+    item_name: p.nume,
+    item_category: p.material,
+    item_variant: p.culoare,
+    price: p.pretPrecomanda,
+    quantity: qty
+  }));
+  const value = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  return { currency: 'RON', value: value, items: items };
+}
+
 
 /* ---------- 3. Rezervări din prima serie ----------
    Pornim de la rezervateManual din products.js. Cu Stripe pornit, cerem
@@ -138,6 +157,7 @@ const parametri = new URLSearchParams(window.location.search);
 if (parametri.get('acces')) {
   scrieLocal(ACCES_KEY, parametri.get('acces').trim());
   arataMesaj('Acces anticipat activat. Bine ai venit!');
+  track('acces_anticipat');
 }
 const codAcces = citesteLocal(ACCES_KEY) || '';
 document.getElementById('early-banner').hidden = !codAcces;
@@ -236,10 +256,16 @@ filterButtons.forEach((button) => {
       b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
     });
     afiseazaProduse();
+    trackFiltre();
   });
 });
-sortSelect.addEventListener('change', afiseazaProduse);
-sizeSelect.addEventListener('change', afiseazaProduse);
+sortSelect.addEventListener('change', () => { afiseazaProduse(); trackFiltre(); });
+sizeSelect.addEventListener('change', () => { afiseazaProduse(); trackFiltre(); });
+
+// Ce caută oamenii: material, mărime, ordine
+function trackFiltre() {
+  track('filtru_produse', { material: filtruMaterial, marime: sizeSelect.value, sortare: sortSelect.value });
+}
 
 // Un singur „ascultător” pentru toate cardurile
 grid.addEventListener('click', (event) => {
@@ -303,6 +329,7 @@ function deschideProdus(id) {
   qvAdd.textContent = disp.ok ? 'Precomandă' : disp.motiv;
 
   quickview.showModal();
+  track('view_item', dateProduse([{ p: p, qty: 1 }]));
 }
 
 qvThumbs.addEventListener('click', (event) => {
@@ -386,19 +413,28 @@ function adaugaInCos(id) {
   salveazaCos();
   afiseazaCos();
   arataMesaj(p.nume + ' a fost adăugat în coș');
+  track('add_to_cart', dateProduse([{ p: p, qty: 1 }]));
 }
 
 function schimbaCantitate(id, schimbare) {
   const item = cos.find((i) => i.id === id);
   if (!item) return;
+  const inainte = item.qty;
   item.qty = Math.min(item.qty + schimbare, limita(gasesteProdus(id)));
   if (item.qty <= 0) cos = cos.filter((i) => i.id !== id);
   salveazaCos();
   afiseazaCos();
+  const diferenta = item.qty - inainte;
+  if (diferenta > 0) track('add_to_cart', dateProduse([{ p: gasesteProdus(id), qty: diferenta }]));
+  if (diferenta < 0) track('remove_from_cart', dateProduse([{ p: gasesteProdus(id), qty: Math.min(-diferenta, inainte) }]));
 }
 
 function totalCos() {
   return cos.reduce((s, item) => s + gasesteProdus(item.id).pretPrecomanda * item.qty, 0);
+}
+
+function dateCos() {
+  return dateProduse(cos.map((item) => ({ p: gasesteProdus(item.id), qty: item.qty })));
 }
 
 function totalAvans() {
@@ -458,7 +494,10 @@ bagItems.addEventListener('click', (event) => {
   if (b) schimbaCantitate(b.dataset.id, Number(b.dataset.qty));
 });
 
-document.getElementById('bag-open').addEventListener('click', () => bagDialog.showModal());
+document.getElementById('bag-open').addEventListener('click', () => {
+  bagDialog.showModal();
+  track('view_cart', dateCos());
+});
 
 // Butoanele de închidere și click-ul pe zona întunecată închid orice fereastră
 document.querySelectorAll('dialog').forEach((dialog) => {
@@ -485,11 +524,15 @@ if (window.location.hash === '#cos') bagDialog.showModal();
 
 /* ---------- 8. Plata cu cardul prin Stripe ---------- */
 const checkoutButton = document.getElementById('checkout-button');
+const COMANDA_KEY = 'elen-comanda-in-curs';
 
 checkoutButton.addEventListener('click', async () => {
   if (cos.length === 0) return;
   const problema = problemaCos();
   if (problema) { bagMessage.textContent = problema; return; }
+
+  const comanda = Object.assign(dateCos(), { tip_plata: tipPlata, platit_acum: tipPlata === 'avans' ? totalAvans() : totalCos() });
+  track('begin_checkout', comanda);
 
   if (PLATA.card === 'demo') {
     bagMessage.textContent = 'Plata nu e conectată încă. Vezi README ca să conectezi Stripe.';
@@ -508,6 +551,7 @@ checkoutButton.addEventListener('click', async () => {
     });
     const date = await raspuns.json();
     if (!raspuns.ok || !date.url) throw new Error(date.error || 'Eroare la plată');
+    scrieLocal(COMANDA_KEY, JSON.stringify(comanda)); // pentru evenimentul purchase, la întoarcere
     window.location.href = date.url; // pagina de plată Stripe
   } catch (error) {
     bagMessage.textContent = error.message && error.message !== 'Failed to fetch'
@@ -518,12 +562,21 @@ checkoutButton.addEventListener('click', async () => {
   }
 });
 
-// După plată, Stripe trimite clientul înapoi la /?plata=reusita
+// După plată, Stripe trimite clientul înapoi la /?plata=reusita&sid=ID_SESIUNE
 const rezultatPlata = parametri.get('plata');
+const comandaInCurs = (() => {
+  try { return JSON.parse(citesteLocal(COMANDA_KEY)); } catch (e) { return null; }
+})();
 if (rezultatPlata === 'reusita') {
   cos = [];
   salveazaCos();
   arataMesaj('Mulțumim! Precomanda e confirmată. Îți scriem pe email înainte de livrare.');
+  // transaction_id = sesiunea Stripe, ca GA4 să nu numere de două ori aceeași plată
+  if (comandaInCurs) track('purchase', Object.assign(comandaInCurs, { transaction_id: parametri.get('sid') || undefined }));
+}
+if (rezultatPlata === 'anulata' && comandaInCurs) track('plata_anulata', comandaInCurs);
+if (rezultatPlata) {
+  try { localStorage.removeItem(COMANDA_KEY); } catch (e) { /* ignorăm */ }
 }
 if (rezultatPlata || parametri.get('acces') || parametri.get('cos')) {
   // Curățăm adresa, ca un refresh să nu repete mesajul
@@ -626,6 +679,7 @@ form.addEventListener('submit', async (event) => {
   form.hidden = true;
   successBox.hidden = false;
   successBox.focus();
+  track('sign_up', { method: 'newsletter' }); // fără email: nu trimitem date personale
 });
 
 

@@ -553,6 +553,23 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
 .js .fade-in.is-visible { opacity: 1; transform: none; }
 
 /* Respect people who turn off animations in their system settings */
+/* ---------- Bannerul de cookie-uri (analytics.js) ---------- */
+.cookie-banner {
+  position: fixed;
+  left: 1rem; right: 1rem; bottom: 1rem;
+  z-index: 60;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 10px 30px rgba(29, 27, 25, 0.12);
+  font-size: 0.9rem;
+}
+.cookie-banner[hidden] { display: none; }
+.cookie-banner p { margin-bottom: 1rem; color: var(--color-muted); }
+.cookie-actions { display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .fade-in { opacity: 1; transform: none; transition: none; }

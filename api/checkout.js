@@ -93,7 +93,7 @@ module.exports = async (req, res) => {
     const origin = `https://${req.headers.host}`;
     form.append('mode', 'payment');
     form.append('locale', 'ro');
-    form.append('success_url', `${origin}/?plata=reusita`);
+    form.append('success_url', `${origin}/?plata=reusita&sid={CHECKOUT_SESSION_ID}`); // sid: pentru analytics
     form.append('cancel_url', `${origin}/?plata=anulata`);
     form.append('shipping_address_collection[allowed_countries][0]', 'RO'); // livrăm doar în România
     form.append('phone_number_collection[enabled]', 'true');                // curierul are nevoie de telefon
