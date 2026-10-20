@@ -7,6 +7,7 @@ index.html          pagina principală (texte, ghid de mărimi, formulare)
 cum-le-facem.html   pagina despre producție
 products.js         PRODUSELE și SETĂRILE DE PRECOMANDĂ (data livrării, avans)
 script.js           magazinul, coșul, plata (sus: SETĂRI PLATĂ)
+analytics.js        Google Analytics, PostHog, Hotjar, Clarity și bannerul de cookie-uri
 style.css           culori, fonturi, aranjare
 api/checkout.js     plata prin Stripe (integral sau avans)
 api/rezervari.js    contorul de rezervări, numărat din plățile Stripe
@@ -127,6 +128,36 @@ După ce livrezi prima serie, site-ul poate redeveni magazin obișnuit, cu stoc,
 ## Formularul de abonare
 
 Arată mesajul de mulțumire, dar nu salvează încă adresele. În `script.js`, caută **AICI CONECTEZI SERVICIUL DE EMAIL** (Formspree sau Mailchimp).
+
+## Analytics: Google Analytics, PostHog, Hotjar, Clarity
+
+Toate patru sunt în `analytics.js`. Pornesc **doar după ce vizitatorul apasă „Accept”** în bannerul de cookie-uri (obligatoriu în UE). Cine refuză nu e urmărit deloc, iar din subsol, la „Setări cookie”, oricine se poate răzgândi.
+
+Ca să pornești un serviciu, pune ID-ul lui sus în `ANALYTICS`, apoi commit și push. Câmpurile goale rămân oprite; dacă toate sunt goale, nu apare niciun banner.
+
+| Serviciu | Unde găsești ID-ul | Câmp |
+|---|---|---|
+| Google Analytics 4 | [analytics.google.com](https://analytics.google.com) → Admin → Data streams → Web → **Measurement ID** (`G-...`) | `ga4` |
+| PostHog | [eu.posthog.com](https://eu.posthog.com) (alege regiunea UE) → Project settings → **Project API key** (`phc_...`) | `posthog.key` |
+| Hotjar | [hotjar.com](https://www.hotjar.com) → Sites & Organizations → **Site ID** (număr) | `hotjar` |
+| Microsoft Clarity | [clarity.microsoft.com](https://clarity.microsoft.com) → Settings → Overview → **Project ID** | `clarity` |
+
+Ce se măsoară, pe lângă vizitele de pagini:
+
+- `view_item`, `add_to_cart`, `remove_from_cart`, `view_cart`, `begin_checkout`, `purchase`: drumul până la precomandă, cu produsele și valoarea în lei. `purchase` vine cu `tip_plata` (avans sau integral) și `platit_acum`. În GA4 apar la Reports → Monetization.
+- `plata_anulata`: cineva a ajuns la Stripe și s-a întors fără să plătească.
+- `sign_up`: abonare la noutăți (fără adresa de email).
+- `filtru_produse`: ce material, mărime și ordine aleg oamenii.
+- `acces_anticipat`: s-a folosit linkul trimis abonaților.
+
+Nu se trimit niciodată emailul, numele, telefonul sau adresa. Hotjar, Clarity și PostHog maschează câmpurile din formulare în înregistrări.
+
+Înainte să pornești analytics:
+- [ ] Scrie în **Politica de confidențialitate** ce servicii folosești, ce colectează și cât timp păstrează datele.
+- [ ] În GA4: Admin → Data settings → Data retention, alege perioada. În Hotjar și Clarity, verifică dacă mascarea textului e pornită.
+- [ ] Verifică: GA4 → Admin → **DebugView**, PostHog → **Activity**, Hotjar și Clarity → **Recordings** (apar după cel mult două ore).
+
+Pentru evenimente noi, rapoarte sau un serviciu nou, proiectul are un agent Claude Code dedicat: `.claude/agents/analytics.md`. Cere-i direct, de exemplu: „folosește agentul analytics să adauge un eveniment când cineva deschide ghidul de mărimi”.
 
 ## Texte, culori, fonturi
 

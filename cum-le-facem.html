@@ -180,6 +180,7 @@
         <li><a href="#">Termeni și condiții</a></li>
         <li><a href="#">Livrare și retur</a></li>
         <li><a href="#">Politica de confidențialitate</a></li>
+        <li hidden><a href="#" data-cookie-settings>Setări cookie</a></li>
         <li><a href="https://anpc.ro/" target="_blank" rel="noopener">ANPC</a></li>
         <li><a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="noopener">Soluționarea alternativă a litigiilor (SAL)</a></li>
       </ul>
@@ -188,6 +189,7 @@
   </footer>
 
   <!-- Setările de precomandă (data livrării, avansul) vin din products.js -->
+  <script src="analytics.js"></script>
   <script src="products.js"></script>
   <script>
     document.querySelectorAll('[data-livrare]').forEach((el) => { el.textContent = PRECOMANDA.livrare; });
