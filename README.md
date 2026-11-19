@@ -283,3 +283,17 @@ Cum lucrezi cu el:
 - **Lista stă în browser.** Dacă ștergi datele browserului sau schimbi calculatorul, o pierzi. Apasă din când în când **Salvează o copie** și, pe alt calculator, **Încarcă o copie**.
 - Pagina nu apare în Google și nu e legată de pe site. Fără parolă, agentul nu pornește.
 - Instagram și TikTok limitează mesajele trimise unor conturi noi. Trimite câteva pe zi, nu zeci deodată.
+
+## Teste
+
+```
+npm install
+npm test
+```
+
+`tests/hero.test.js` deschide pagina principală într-un browser Chromium real, pe telefon și pe desktop, și verifică:
+- fără `images/hero.jpg`, apare desenul `images/hero.svg`, nu o imagine stricată, iar titlul rămâne alb și în interiorul hero-ului;
+- cu `images/hero.jpg`, apare fotografia, iar desenul nici nu mai e cerut;
+- dacă lipsește și desenul, pagina nu reîncearcă la nesfârșit.
+
+Testele au nevoie de Chromium. Dacă nu e găsit singur, rulează o dată `npx playwright-core install chromium` sau setează `CHROMIUM_PATH` cu calea către browser.
