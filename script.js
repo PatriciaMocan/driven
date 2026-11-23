@@ -369,21 +369,52 @@ let tipPlata = 'avans'; // 'avans' sau 'integral'
 /* Linkul din emailurile despre coș: /?cos=sola:1,lido:2#cos
    Pune coșul înapoi exact cum era, chiar și pe alt telefon sau calculator. */
 if (parametri.get('cos')) {
-  const dinLink = parametri.get('cos').split(',').map((bucata) => {
+  const dinLink = normalizeazaCos(parametri.get('cos').split(',').map((bucata) => {
     const [id, qty] = bucata.split(':');
-    return { id: id, qty: Math.min(MAX_BUCATI, Math.floor(Number(qty)) || 0) };
-  }).filter((item) => gasesteProdus(item.id) && item.qty > 0);
-  if (dinLink.length) cos = dinLink;
+    return { id: id, qty: qty };
+  }));
+  if (dinLink.cos.length) {
+    cos = dinLink.cos;
+    if (dinLink.ajustat) arataMesaj('Am ajustat cantitățile din coș.');
+  }
+}
+
+/* Aduce coșul la o formă validă: un singur rând pe model, cantități întregi,
+   cel mult cât se poate precomanda (limita de bucăți și locurile libere).
+   Scoate modelele care nu mai există în products.js.
+   Întoarce { cos, ajustat } — ajustat e true dacă s-a schimbat ceva. */
+function normalizeazaCos(lista) {
+  const rezultat = [];
+  let ajustat = false;
+  for (const item of Array.isArray(lista) ? lista : []) {
+    const p = item && gasesteProdus(item.id);
+    const qty = Math.floor(Number(item && item.qty));
+    if (!p || !(qty > 0)) { ajustat = true; continue; }
+    if (qty !== Number(item.qty)) ajustat = true;
+    const existent = rezultat.find((i) => i.id === p.id);
+    if (existent) { existent.qty += qty; ajustat = true; } else rezultat.push({ id: p.id, qty: qty });
+  }
+  for (const item of rezultat) {
+    const maxim = limita(gasesteProdus(item.id));
+    if (item.qty > maxim) { item.qty = maxim; ajustat = true; }
+  }
+  return { cos: rezultat.filter((item) => item.qty > 0), ajustat: ajustat };
 }
 
 function incarcaCos() {
+  let salvat;
   try {
-    const salvat = JSON.parse(citesteLocal(BAG_KEY)) || [];
-    // Scoatem ce nu mai există în products.js
-    return salvat.filter((item) => gasesteProdus(item.id) && item.qty > 0);
+    salvat = JSON.parse(citesteLocal(BAG_KEY)) || [];
   } catch (e) {
     return [];
   }
+  const { cos: valid, ajustat } = normalizeazaCos(salvat);
+  if (ajustat) {
+    // Salvăm forma corectată, ca mesajul să nu reapară la fiecare reîncărcare
+    scrieLocal(BAG_KEY, JSON.stringify(valid));
+    if (valid.length) arataMesaj('Am ajustat cantitățile din coș.');
+  }
+  return valid;
 }
 
 function salveazaCos() {
@@ -549,12 +580,19 @@ checkoutButton.addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: cos, tip: tipPlata, acces: codAcces, email: emailCos() })
     });
-    const date = await raspuns.json();
-    if (!raspuns.ok || !date.url) throw new Error(date.error || 'Eroare la plată');
+    // Un răspuns care nu e JSON (de exemplu o pagină de eroare a serverului) nu trebuie să ajungă la client
+    let date = {};
+    try { date = await raspuns.json(); } catch (e) { /* rămâne {} */ }
+    if (!raspuns.ok || !date.url) {
+      const eroare = new Error(date.error || '');
+      eroare.pentruClient = Boolean(date.error); // mesajele scrise de noi pentru client
+      throw eroare;
+    }
     scrieLocal(COMANDA_KEY, JSON.stringify(comanda)); // pentru evenimentul purchase, la întoarcere
     window.location.href = date.url; // pagina de plată Stripe
   } catch (error) {
-    bagMessage.textContent = error.message && error.message !== 'Failed to fetch'
+    // Arătăm doar mesajele serverului nostru; erorile tehnice (rețea, JSON) devin un mesaj simplu
+    bagMessage.textContent = error.pentruClient
       ? error.message
       : 'Plata nu s-a deschis. Încearcă din nou peste un minut.';
     checkoutButton.disabled = false;

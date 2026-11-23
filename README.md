@@ -302,4 +302,10 @@ npm test
 - pe desktop au exact dimensiunile de dinainte, iar linkurile din interiorul frazelor au rămas neschimbate;
 - filtrele magazinului încă funcționează.
 
+`tests/checkout-api.test.js` verifică funcția de plată (`api/checkout.js`) cu un Stripe simulat (nicio cerere reală, nicio cheie reală): sume în lei din `products.js`, avans, linii duplicate unite, comenzi greșite respinse (cantități peste 10, cu zecimale, modele inexistente), locurile din serie, accesul anticipat și erorile.
+
+`tests/cart-checkout.test.js` verifică în browser CTA-urile, conținutul coșului, limitele de cantitate, corectarea coșurilor greșite și ce vede clientul la succes, refuz sau eroare de plată.
+
+Ce nu se poate verifica fără o cheie Stripe și un deploy real e scris separat în [`docs/checkout-ce-nu-se-poate-verifica.md`](docs/checkout-ce-nu-se-poate-verifica.md).
+
 Testele au nevoie de Chromium. Dacă nu e găsit singur, rulează o dată `npx playwright-core install chromium` sau setează `CHROMIUM_PATH` cu calea către browser.

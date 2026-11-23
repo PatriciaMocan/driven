@@ -37,8 +37,30 @@ module.exports = async (req, res) => {
   }
 
   const body = req.body || {};
-  const items = Array.isArray(body.items) ? body.items : [];
   const avans = body.tip === 'avans';
+
+  // Verificăm coșul înainte de orice: o linie greșită respinge toată comanda,
+  // ca clientul să nu plătească niciodată altceva decât vede în coș.
+  // Același model trimis de mai multe ori se adună, ca limitele să se aplice pe total.
+  const items = [];
+  for (const item of Array.isArray(body.items) ? body.items : []) {
+    const produs = item && PRODUCTS.find((p) => p.id === item.id);
+    const qty = Number(item && item.qty);
+    if (!produs) {
+      return res.status(400).json({ error: 'Coșul conține un model care nu mai există. Reîncarcă pagina și verifică coșul.' });
+    }
+    if (!Number.isInteger(qty) || qty < 1) {
+      return res.status(400).json({ error: `Cantitatea pentru ${produs.nume} nu e validă.` });
+    }
+    const existent = items.find((i) => i.id === produs.id);
+    if (existent) existent.qty += qty;
+    else items.push({ id: produs.id, qty });
+  }
+  const pesteLimita = items.find((i) => i.qty > MAX_BUCATI);
+  if (pesteLimita) {
+    const produs = PRODUCTS.find((p) => p.id === pesteLimita.id);
+    return res.status(400).json({ error: `Online poți precomanda cel mult ${MAX_BUCATI} bucăți din ${produs.nume}.` });
+  }
   const codCorect = process.env.ACCES_ANTICIPAT_COD;
   const areAcces = Boolean(codCorect) && body.acces === codCorect;
 
@@ -53,8 +75,7 @@ module.exports = async (req, res) => {
 
     for (const item of items) {
       const produs = PRODUCTS.find((p) => p.id === item.id);
-      const qty = Math.floor(Number(item.qty));
-      if (!produs || !(qty >= 1 && qty <= MAX_BUCATI)) continue; // ignorăm ce nu e în regulă
+      const qty = item.qty;
 
       const etapa = etapaLansare(produs);
       if (etapa === 'curand' || (etapa === 'abonati' && !areAcces)) {

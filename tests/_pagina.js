@@ -49,11 +49,17 @@ async function porneste() {
 
 /* Deschide o pagină a site-ului la lățimea dată. Cererile către alte site-uri
    (fonturi, analytics) sunt blocate, ca rezultatele să nu depindă de internet.
-   Tranzițiile și animațiile sunt oprite, ca stilurile citite să fie cele finale. */
-async function deschide(browser, adresa, cale, ecran) {
+   Tranzițiile și animațiile sunt oprite, ca stilurile citite să fie cele finale.
+   `rute` (opțional): funcție (route, url) care răspunde ea la o cerere și întoarce true,
+   de exemplu ca să simuleze /api/checkout. */
+async function deschide(browser, adresa, cale, ecran, rute) {
   const pagina = await browser.newPage({ viewport: { width: ecran.width, height: ecran.height } });
-  await pagina.route('**/*', (route) =>
-    new URL(route.request().url()).origin === adresa ? route.continue() : route.abort());
+  await pagina.route('**/*', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.origin !== adresa) return route.abort();
+    if (rute && (await rute(route, url))) return undefined;
+    return route.continue();
+  });
   await pagina.goto(adresa + cale);
   await pagina.addStyleTag({
     content: '*, *::before, *::after { transition: none !important; animation: none !important; } .fade-in { opacity: 1 !important; transform: none !important; }'
