@@ -151,7 +151,7 @@ test('coșul rămâne după reîncărcarea paginii', async () => {
 
 /* ---------- Validarea cantității ---------- */
 
-test('„+” se oprește la 10 bucăți', async () => {
+test('„+” se oprește la 10 bucăți și spune de ce', async () => {
   const p = await pagina('/');
   await p.click('#product-grid [data-add="sola"]');
   await p.click('#bag-open');
@@ -159,6 +159,36 @@ test('„+” se oprește la 10 bucăți', async () => {
   const c = await continutCos(p);
   assert.equal(c.randuri[0].qty, '10');
   assert.equal(c.numar, '10');
+  assert.equal(c.mesaj, 'Online poți precomanda cel mult 10 bucăți. Scrie-ne pentru mai multe.');
+  await p.close();
+});
+
+test('seria se umple după ce produsul e în coș: „+” nu-l scoate, explică de ce', async () => {
+  const p = await pagina('/');
+  await p.click('#product-grid [data-add="lido"]');
+  await p.click('#bag-open');
+  await p.evaluate((serie) => { rezervate.lido = serie; afiseazaProduse(); afiseazaCos(); }, produs('lido').serie);
+  await p.click('#bag .qty button[data-qty="1"]');
+  const c = await continutCos(p);
+  assert.deepEqual(c.randuri.map((r) => [r.nume, r.qty]), [['Lido', '1']]);
+  assert.equal(c.mesaj, 'Prima serie Lido s-a rezervat complet.');
+
+  // La plată, clientul află ce are de făcut
+  await p.click('#checkout-button');
+  assert.match(await p.textContent('#bag-message'), /Lido: prima serie s-a rezervat complet\. Scoate-l din coș/);
+  await p.close();
+});
+
+test('mai puține locuri decât în coș: „−” scade câte o bucată, plata spune limita', async () => {
+  const p = await pagina('/');
+  await p.evaluate(() => localStorage.setItem('elen-cos', JSON.stringify([{ id: 'riva', qty: 5 }])));
+  await p.reload();
+  await p.click('#bag-open');
+  await p.evaluate((serie) => { rezervate.riva = serie - 2; afiseazaProduse(); afiseazaCos(); }, produs('riva').serie);
+  await p.click('#bag .qty button[data-qty="-1"]');
+  assert.equal((await continutCos(p)).randuri[0].qty, '4');
+  await p.click('#checkout-button');
+  assert.equal(await p.textContent('#bag-message'), 'Din prima serie Riva mai sunt libere doar 2 bucăți.');
   await p.close();
 });
 

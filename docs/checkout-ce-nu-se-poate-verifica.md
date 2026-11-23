@@ -2,11 +2,15 @@
 
 Testele automate (`npm test`) acoperă CTA-urile, coșul, validarea cantităților și răspunsurile de succes și eroare ale checkout-ului. Toate folosesc un **Stripe simulat**. Nu se face nicio cerere către Stripe și nu se folosește nicio cheie reală. Pe scurt: testele dovedesc că *codul nostru* trimite și primește ce trebuie, nu că plata funcționează cap-coadă.
 
-La data testelor, în Vercel nu era setată nicio cheie Stripe, iar `PLATA.card` din `script.js` era `'demo'`.
+Starea configurației, după cum ai confirmat (cheia n-a fost văzută sau folosită de aici):
+- **În Vercel e setată o cheie Stripe de test** (`sk_test_`).
+- **`PLATA.card` din `script.js` e încă `'demo'`**, deci site-ul nu apelează Stripe. Am lăsat-o așa intenționat.
+
+> **Atenție:** dacă pui `PLATA.card = 'stripe'` pe site-ul public cât timp cheia e de test, oricine poate „plăti” cu un card de test. Plățile de test sunt numărate în contorul „X din Y rezervate”, ca și cum ar fi reale. Testează cu cheia de test doar pe un **deploy de preview**. Pe producție, comută la `'stripe'` numai împreună cu cheia live.
 
 ## 1. Ce rămâne de verificat manual, cu o cheie de test
 
-Doar după ce pui `STRIPE_SECRET_KEY = sk_test_...` în Vercel (Settings → Environment Variables) și `PLATA.card = 'stripe'`, **pe un deploy de preview**:
+Cheia de test e deja în Vercel. Pune `PLATA.card = 'stripe'` **doar pe un deploy de preview** (de exemplu pe o ramură separată) și verifică:
 
 | De verificat | Cum |
 |---|---|
@@ -17,6 +21,7 @@ Doar după ce pui `STRIPE_SECRET_KEY = sk_test_...` în Vercel (Settings → Env
 | „Înapoi” din Stripe păstrează coșul | Link-ul de anulare din pagina Stripe. |
 | Avansul și restul apar corect | Stripe → Payments → plata → Metadata (`tip`, `rest_de_plata_lei`). |
 | Contorul „X din Y rezervate” crește după plată | Reîncarcă pagina după o plată de test (contorul e păstrat ~30 s). |
+| Un produs deja în coș rămâne acolo după ce seria se umple, iar plata spune ce trebuie ajustat | Testat automat cu contorul simulat. Pe date reale, doar cu plăți de test care umplu seria. |
 | Apple Pay / Google Pay | Doar pe un telefon cu portofel configurat și pe domeniul tău, verificat în Stripe. |
 
 ## 2. Limite cunoscute, care nu se pot reproduce în teste

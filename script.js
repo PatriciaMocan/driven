@@ -434,9 +434,7 @@ function adaugaInCos(id) {
 
   const item = cos.find((i) => i.id === id);
   if (item && item.qty >= limita(p)) {
-    arataMesaj(libere(p) <= MAX_BUCATI
-      ? 'Din prima serie ' + p.nume + ' mai sunt libere doar ' + bucati(libere(p)) + '.'
-      : 'Online poți precomanda cel mult ' + MAX_BUCATI + ' bucăți. Scrie-ne pentru mai multe.');
+    arataMesaj(mesajLimita(p));
     return;
   }
   if (item) item.qty += 1;
@@ -447,11 +445,27 @@ function adaugaInCos(id) {
   track('add_to_cart', dateProduse([{ p: p, qty: 1 }]));
 }
 
+// De ce nu mai crește cantitatea: seria s-a umplut, mai sunt puține locuri sau limita de bucăți
+function mesajLimita(p) {
+  if (libere(p) <= 0) return 'Prima serie ' + p.nume + ' s-a rezervat complet.';
+  return libere(p) <= MAX_BUCATI
+    ? 'Din prima serie ' + p.nume + ' mai sunt libere doar ' + bucati(libere(p)) + '.'
+    : 'Online poți precomanda cel mult ' + MAX_BUCATI + ' bucăți. Scrie-ne pentru mai multe.';
+}
+
+/* „+” și „−” fac exact ce scrie pe ele: „+” crește cu o bucată doar sub limită
+   (altfel explică de ce nu), „−” scade cu o bucată. Un produs nu dispare singur din coș
+   când seria se umple între timp; la plată, problemaCos() spune ce trebuie ajustat. */
 function schimbaCantitate(id, schimbare) {
   const item = cos.find((i) => i.id === id);
   if (!item) return;
+  const p = gasesteProdus(id);
+  if (schimbare > 0 && item.qty >= limita(p)) {
+    arataMesaj(mesajLimita(p));
+    return;
+  }
   const inainte = item.qty;
-  item.qty = Math.min(item.qty + schimbare, limita(gasesteProdus(id)));
+  item.qty = item.qty + schimbare;
   if (item.qty <= 0) cos = cos.filter((i) => i.id !== id);
   salveazaCos();
   afiseazaCos();
