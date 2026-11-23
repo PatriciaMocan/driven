@@ -992,3 +992,32 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
   .qty button:active { background: var(--color-beige); }
   .select select:active { border-color: var(--color-text); }
 }
+
+/* =========================================================
+   20. Paginile legale (termeni.html, livrare-retur.html, confidentialitate.html)
+   ========================================================= */
+.legal-hero {
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 8rem 0 3rem;
+}
+.legal-hero .eyebrow { color: rgba(247, 244, 238, 0.7); }
+.legal-hero .section-title { margin-bottom: 0.75rem; }
+.legal-updated { font-size: 0.875rem; color: rgba(247, 244, 238, 0.8); margin: 0; }
+
+.legal { max-width: 46rem; }
+.legal-section { margin-top: 2.5rem; }
+.legal-section h2 { font-size: clamp(1.6rem, 4vw, 2rem); margin-bottom: 0.75rem; }
+
+/* Marcaj vizibil pentru informațiile încă indisponibile. Șterge-l odată cu textul de completat. */
+.de-completat {
+  background: var(--color-beige);
+  border-left: 3px solid var(--color-accent);
+  padding: 0.85rem 1rem;
+  color: var(--color-text);
+}
+.de-completat-inline {
+  background: var(--color-beige);
+  color: var(--color-text);
+  padding: 0 0.35rem;
+}

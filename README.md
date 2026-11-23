@@ -306,6 +306,8 @@ npm test
 
 `tests/cart-checkout.test.js` verifică în browser CTA-urile, conținutul coșului, limitele de cantitate, corectarea coșurilor greșite și ce vede clientul la succes, refuz sau eroare de plată.
 
+`tests/links-placeholders.test.js` verifică faptul că linkurile interne de pe paginile publice duc la pagini și secțiuni care există, că subsolul leagă paginile legale și că secțiunile legale necompletate sunt marcate vizibil. Testul care cere zero placeholdere e marcat TODO până primești datele reale (vezi [`docs/date-de-completat.md`](docs/date-de-completat.md)). Linkurile externe se verifică doar cu `VERIFICA_EXTERN=1 npm test`.
+
 Ce nu se poate verifica fără o cheie Stripe și un deploy real e scris separat în [`docs/checkout-ce-nu-se-poate-verifica.md`](docs/checkout-ce-nu-se-poate-verifica.md).
 
 Testele au nevoie de Chromium. Dacă nu e găsit singur, rulează o dată `npx playwright-core install chromium` sau setează `CHROMIUM_PATH` cu calea către browser.

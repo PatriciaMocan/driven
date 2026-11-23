@@ -16,13 +16,15 @@ Inventar făcut pe `index.html` și `cum-le-facem.html`, împreună cu textele c
 | Link Instagram | subsol, ambele pagini | `https://instagram.com/` (fără cont) | |
 | Domeniul site-ului | etichetele de share, ambele pagini | `elensunglasses.ro` (presupus) | |
 
-## B. Pagini legale (linkurile din subsol duc acum la `#`)
+## B. Pagini legale
+
+Paginile există (`termeni.html`, `livrare-retur.html`, `confidentialitate.html`), iar linkurile din subsol duc la ele. Deocamdată au doar structura: fiecare secțiune e marcată vizibil `[DE COMPLETAT]`, cu o indicație despre ce trebuie să conțină. Au și `noindex`, ca să nu apară în Google până au text. Textul juridic trebuie scris sau verificat de un avocat. Când îl ai, trimite-l și îl pun în pagini.
 
 | Pagină | Ai textul? (da / nu) | Cine l-a scris (avocat, generator etc.) |
 |---|---|---|
-| Termeni și condiții (inclusiv dreptul de retragere și formularul de retragere) | | |
-| Livrare și retur | | |
-| Politica de confidențialitate | | |
+| Termeni și condiții (`termeni.html`, inclusiv dreptul de retragere și formularul de retragere) | | |
+| Livrare și retur (`livrare-retur.html`) | | |
+| Politica de confidențialitate (`confidentialitate.html`) | | |
 
 Pentru livrare, retur și confidențialitate e nevoie și de:
 
@@ -71,3 +73,10 @@ Pentru fiecare: **păstrez** (cu cifrele reale), **modific** (cum) sau **scot**.
 | `https://anpc.ro/` | neverificat: rețeaua sesiunii blochează `anpc.ro` |
 | `https://anpc.ro/ce-este-sal/` | neverificat: la fel |
 | Instagram | de completat (A) |
+
+## Cum verific după completare
+
+- `npm test` verifică linkurile interne și paginile legale. Testul „nicio pagină publică nu mai are placeholdere” e marcat TODO și listează ce mai lipsește: `[EDIT ME]`, `[DE COMPLETAT]`, emailul de exemplu, Instagram fără cont și `noindex`. După completare, scot marcajul TODO și testul devine obligatoriu.
+- Promisiunile din secțiunile C și D nu au un marcaj vizibil (așa ai ales), deci testele nu le pot detecta automat. Le verific manual, pe baza deciziilor tale din tabel.
+- Linkurile externe: `VERIFICA_EXTERN=1 npm test`, dintr-un mediu cu acces la internet.
+
