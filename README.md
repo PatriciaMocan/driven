@@ -296,4 +296,10 @@ npm test
 - cu `images/hero.jpg`, apare fotografia, iar desenul nici nu mai e cerut;
 - dacă lipsește și desenul, pagina nu reîncearcă la nesfârșit.
 
+`tests/touch-targets.test.js` verifică butoanele, meniul, filtrele și linkurile pe telefon și tabletă:
+- au cel puțin 44 × 44 px, ca să fie ușor de apăsat cu degetul (regulile sunt în `style.css`, secțiunea 19, doar sub 900 px);
+- arată conturul terracotta când ajungi la ele cu tastatura și se întunecă ușor când sunt apăsate;
+- pe desktop au exact dimensiunile de dinainte, iar linkurile din interiorul frazelor au rămas neschimbate;
+- filtrele magazinului încă funcționează.
+
 Testele au nevoie de Chromium. Dacă nu e găsit singur, rulează o dată `npx playwright-core install chromium` sau setează `CHROMIUM_PATH` cu calea către browser.

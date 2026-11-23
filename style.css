@@ -888,3 +888,107 @@ dialog::backdrop { background: rgba(29, 27, 25, 0.5); }
   .admin-item { grid-template-columns: 140px 1fr; }
 }
 .field-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.4rem; }
+
+/* =========================================================
+   19. Ținte de atingere pe mobil
+   Pe ecrane sub 900 px, orice control pe care îl apeși cu degetul
+   are cel puțin 44 × 44 px (WCAG 2.5.5, ghidul Apple).
+   Desktopul (900 px și peste) rămâne exact ca înainte.
+   Linkurile din interiorul frazelor nu sunt atinse intenționat.
+   ========================================================= */
+@media (max-width: 899px) {
+  :root { --touch: 44px; }
+
+  /* Navigarea din antet */
+  .main-nav a,
+  .bag-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+    min-width: var(--touch);
+    justify-content: center;
+    padding: 0 0.25rem;
+  }
+
+  /* Filtrele și selectoarele magazinului */
+  .filter,
+  .select select {
+    min-height: var(--touch);
+  }
+
+  /* Butoanele mici: „Precomandă”, „Vreau acces anticipat” etc. */
+  .btn-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--touch);
+  }
+
+  /* Linkul „Vezi cum le facem →” stă singur pe rând, nu în frază */
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+  }
+
+  /* Întrebările frecvente: rândul pe care apeși e mai înalt, spațiul din jur mai mic,
+     ca lista să ocupe cam același loc */
+  .faq details { padding: 0.5rem 0; }
+  .faq summary { min-height: var(--touch); align-items: center; }
+
+  /* Ferestrele: butonul de închidere și cantitatea din coș */
+  .dialog-close {
+    min-width: var(--touch);
+    min-height: var(--touch);
+  }
+  .qty button {
+    width: var(--touch);
+    height: var(--touch);
+  }
+  .bag-item-price { white-space: nowrap; } /* butoanele mai late nu împing prețul pe două rânduri */
+
+  /* Linkurile din listele din subsol (sublinierea trece pe text, ca să nu stea departe de el) */
+  .footer-links { gap: 0; }
+  .footer-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch);
+    min-width: var(--touch);
+    border-bottom: 0;
+    text-decoration: underline;
+    text-decoration-color: rgba(207, 198, 186, 0.4);
+    text-underline-offset: 4px;
+  }
+
+  .skip-link { padding: 0.75rem 1rem; }
+
+  /* ---------- Feedback la apăsare: o ușoară întunecare ---------- */
+  .main-nav a,
+  .bag-button,
+  .filter,
+  .btn,
+  .text-link,
+  .faq summary,
+  .dialog-close,
+  .qty button,
+  .footer-links a {
+    -webkit-tap-highlight-color: transparent; /* evităm pătratul gri din Safari, avem efectul nostru */
+  }
+
+  .main-nav a:active,
+  .bag-button:active,
+  .footer-links a:active { opacity: 0.7; }
+
+  .filter:active { background: rgba(29, 27, 25, 0.08); }
+  .filter.is-active:active { background: #000; border-color: #000; }
+
+  .btn-primary:active { background: #93401F; }          /* terracotta mai închis */
+  .btn-outline:active { background: rgba(29, 27, 25, 0.08); }
+  .btn-light:active { background: var(--color-beige); }
+
+  .text-link:active { color: #93401F; }
+  .faq summary:active { color: var(--color-muted); }
+  .dialog-close:active,
+  .qty button:active { background: var(--color-beige); }
+  .select select:active { border-color: var(--color-text); }
+}
