@@ -1,0 +1,7 @@
+# Google și celelalte motoare de căutare pot citi tot site-ul public.
+# Paginile private (admin, agent) și cele legale încă neterminate au
+# <meta name="robots" content="noindex">, deci nu apar în căutări.
+User-agent: *
+Disallow: /api/
+
+Sitemap: https://elensunglasses.ro/sitemap.xml
