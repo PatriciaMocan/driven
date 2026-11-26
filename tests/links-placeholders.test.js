@@ -16,7 +16,8 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { porneste, deschide } = require('./_pagina.js');
 
-const PAGINI = ['/index.html', '/cum-le-facem.html', '/termeni.html', '/livrare-retur.html', '/confidentialitate.html'];
+const PAGINI = ['/index.html', '/cum-le-facem.html', '/termeni.html', '/livrare-retur.html', '/confidentialitate.html',
+  '/articole/acetat-vs-plastic.html', '/articole/cat-costa-ochelari-de-soare-buni.html', '/articole/ce-inseamna-uv400.html', '/articole/cum-cureti-ochelarii-de-soare.html', '/articole/index.html', '/articole/marime-ochelari-de-soare.html', '/articole/ochelari-de-soare-aluneca-strang.html', '/articole/ochelari-de-soare-falsi.html', '/articole/ochelari-de-soare-forma-fetei.html', '/articole/ochelari-de-soare-polarizati.html', '/articole/rame-titan.html'];
 const LEGALE = {
   'Termeni și condiții': 'termeni.html',
   'Livrare și retur': 'livrare-retur.html',
@@ -68,7 +69,7 @@ for (const cale of PAGINI) {
 for (const cale of PAGINI) {
   test(`${cale}: subsolul are cele trei linkuri legale, spre paginile reale`, async () => {
     const p = await deschide(mediu.browser, mediu.adresa, cale, ECRAN);
-    const dinSubsol = await p.$$eval('.footer-legal a', (els) => els.map((a) => [a.textContent.trim(), a.getAttribute('href')]));
+    const dinSubsol = await p.$$eval('.footer-legal a', (els) => els.map((a) => [a.textContent.trim(), new URL(a.href).pathname.slice(1)]));
     await p.close();
     for (const [text, fisier] of Object.entries(LEGALE)) {
       assert.ok(dinSubsol.some(([t, h]) => t === text && h === fisier), `lipsește „${text}” → ${fisier}`);
