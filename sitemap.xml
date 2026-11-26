@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Paginile care trebuie să apară în Google. Paginile cu noindex nu intră aici.
+     Când adaugi o pagină publică nouă, adaug-o și aici. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://elensunglasses.ro/</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/cum-le-facem.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+</urlset>
