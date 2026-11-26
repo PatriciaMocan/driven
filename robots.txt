@@ -1,0 +1,7 @@
+# Ce pot citi motoarele de căutare.
+# Paginile private (admin, agent) și cele legale încă necompletate au deja
+# „noindex”, ca Google să le vadă și să nu le afișeze. De aceea nu le blocăm aici.
+User-agent: *
+Disallow: /api/
+
+Sitemap: https://elensunglasses.ro/sitemap.xml

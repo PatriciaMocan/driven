@@ -250,7 +250,20 @@ Pentru evenimente noi, rapoarte sau un serviciu nou, proiectul are un agent Clau
 
 - **Texte:** în `index.html` și `cum-le-facem.html`. Fiecare secțiune începe cu un comentariu de forma `<!-- ===== 5. DESPRE ===== -->`. Povestea brandului e marcată cu `[EDIT ME]`.
 - **Culori și fonturi:** blocul `:root` din începutul `style.css`. Culoarea de accent e `--color-accent`.
-- **Domeniul:** înlocuiește `https://elensunglasses.ro` din etichetele `og:` ale ambelor pagini cu domeniul tău real.
+- **Domeniul:** înlocuiește `https://elensunglasses.ro` cu domeniul tău real în etichetele `og:` și `canonical` ale ambelor pagini, în `sitemap.xml` și în `robots.txt`. `npm test` verifică dacă au rămas în acord.
+
+## Google Search Console
+
+Search Console îți arată dacă Google găsește site-ul, ce caută oamenii când îl văd și ce erori are. Site-ul are deja `sitemap.xml`, `robots.txt` și adresele `canonical`. Mai trebuie doar să dovedești că domeniul e al tău.
+
+1. Intră pe [search.google.com/search-console](https://search.google.com/search-console/welcome) cu contul Google care va deține site-ul.
+2. Alege una dintre variante:
+   - **Domain** (recomandat): scrii `elensunglasses.ro` și primești un record **TXT** `google-site-verification=...`. Îl adaugi în DNS, acolo unde e administrat domeniul (registrar sau Vercel → Domains), apoi apeși **Verify**. Nu schimbi nimic în cod.
+   - **URL prefix**: scrii `https://elensunglasses.ro/` și alegi **HTML tag**. În `index.html` există un loc pregătit, marcat „Google Search Console”: pune acolo linia primită, scoate-o din comentariu și publică site-ul, apoi apasă **Verify**.
+3. În Search Console → **Sitemaps**, trimite `sitemap.xml`.
+4. Ca să mai dai acces cuiva: **Settings → Users and permissions → Add user**. Pot exista mai mulți proprietari, fiecare cu propriul cod de verificare.
+
+Când paginile legale primesc text și scapi de `noindex`, adaugă-le în `sitemap.xml` și pune-le `canonical`. Testul `tests/seo.test.js` îți amintește dacă uiți.
 
 ## Agentul de clienți
 

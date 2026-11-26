@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Paginile pe care vrem să le găsească Google. Doar cele fără „noindex”.
+     Când paginile legale primesc text și scapă de „noindex”, adaugă-le și aici. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://elensunglasses.ro/</loc>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/cum-le-facem.html</loc>
+  </url>
+</urlset>
