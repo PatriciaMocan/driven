@@ -14,7 +14,7 @@ Inventar făcut pe `index.html` și `cum-le-facem.html`, împreună cu textele c
 | Adresa sediului | subsol, ambele pagini | `[EDIT ME]` | |
 | Email de contact | subsol (2 pagini), ghidul de mărimi | `salut@example.com` | |
 | Link Instagram | subsol, ambele pagini | `https://instagram.com/` (fără cont) | |
-| Domeniul site-ului | etichetele de share, ambele pagini | `elensunglasses.ro` (presupus) | |
+| Domeniul site-ului | etichetele de share și `canonical` din ambele pagini, `robots.txt`, `sitemap.xml` | `elensunglasses.ro` (presupus) | |
 
 ## B. Pagini legale
 

@@ -246,6 +246,17 @@ Nu se trimit niciodată emailul, numele, telefonul sau adresa. Hotjar, Clarity �
 
 Pentru evenimente noi, rapoarte sau un serviciu nou, proiectul are un agent Claude Code dedicat: `.claude/agents/analytics.md`. Cere-i direct, de exemplu: „folosește agentul analytics să adauge un eveniment când cineva deschide ghidul de mărimi”.
 
+## Google Search Console
+
+Site-ul e pregătit pentru Google: `robots.txt` (lasă Google să citească site-ul, mai puțin `/api/`), `sitemap.xml` (pagina principală și `cum-le-facem.html`) și `<link rel="canonical">` pe ambele pagini publice. Paginile legale, admin și agent au `noindex` și nu apar în căutări.
+
+Ce rămâne de făcut în contul Google (doar proprietarul domeniului poate):
+1. Deschide [Search Console](https://search.google.com/search-console/welcome), alege **Domain** și scrie `elensunglasses.ro`.
+2. Copiază înregistrarea TXT `google-site-verification=...` și pune-o în DNS-ul domeniului (la firma de unde e cumpărat), apoi apasă **Verify**. Nu trebuie schimbat nimic în cod.
+3. La **Sitemaps** trimite `https://elensunglasses.ro/sitemap.xml`.
+
+Dacă domeniul real nu e `elensunglasses.ro`, înlocuiește-l și în `robots.txt`, `sitemap.xml` și în `canonical` din `index.html` și `cum-le-facem.html`. Când adaugi o pagină publică nouă, adaug-o în `sitemap.xml`.
+
 ## Texte, culori, fonturi
 
 - **Texte:** în `index.html` și `cum-le-facem.html`. Fiecare secțiune începe cu un comentariu de forma `<!-- ===== 5. DESPRE ===== -->`. Povestea brandului e marcată cu `[EDIT ME]`.
