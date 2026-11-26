@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Paginile care trebuie să apară în Google. Paginile cu noindex nu intră aici.
+     Ghidurile din articole/ nu au linkuri pe site: Google le găsește de aici. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://elensunglasses.ro/</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/cum-le-facem.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/ce-inseamna-uv400.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/ochelari-de-soare-polarizati.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/acetat-vs-plastic.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/marime-ochelari-de-soare.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/ochelari-de-soare-forma-fetei.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/cat-costa-ochelari-de-soare-buni.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/ochelari-de-soare-falsi.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/ochelari-de-soare-aluneca-strang.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/cum-cureti-ochelarii-de-soare.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+  <url>
+    <loc>https://elensunglasses.ro/articole/rame-titan.html</loc>
+    <lastmod>2026-11-26</lastmod>
+  </url>
+</urlset>
